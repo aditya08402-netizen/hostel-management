@@ -1,155 +1,720 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>Hostel Room Allotment</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Hostel Room Allotment with Warden Permissions</title>
 <style>
-*{box-sizing:border-box}body{margin:0;font-family:Arial,sans-serif;background:#f3f6f9;color:#1f2937}.login-page{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;background:linear-gradient(135deg,#1e3a8a,#2563eb)}.login-box{background:white;width:100%;max-width:390px;padding:28px;border-radius:18px;box-shadow:0 12px 35px rgba(0,0,0,.25)}.login-box h1{text-align:center;color:#1e3a8a;margin:0 0 8px}.muted{color:#6b7280;font-size:13px}input,select,textarea{width:100%;padding:10px;border:1px solid #d1d5db;border-radius:8px;font-size:14px}label{font-size:13px;font-weight:bold;color:#374151}.field{display:flex;flex-direction:column;gap:5px;margin-bottom:10px}button{border:0;padding:10px 13px;border-radius:8px;cursor:pointer;font-weight:bold}.primary{background:#2563eb;color:white}.danger{background:#dc2626;color:white}.gray{background:#e5e7eb;color:#111827}.green{background:#16a34a;color:white}.white{background:white;color:#1e3a8a}.orange{background:#f97316;color:white}.error{display:none;background:#fee2e2;color:#991b1b;padding:10px;border-radius:8px;margin-bottom:12px;font-weight:bold;text-align:center}#app{display:none}header{background:#1e3a8a;color:white;padding:16px 20px;display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}header h1{font-size:21px;margin:0}.top{display:flex;gap:8px;align-items:center;flex-wrap:wrap}.badge{background:rgba(255,255,255,.15);padding:8px 10px;border-radius:8px;font-size:13px}.container{padding:20px;max-width:1400px;margin:auto}.summary{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:14px;margin-bottom:18px}.card,.panel,.controls,.room{background:white;border-radius:12px;box-shadow:0 2px 10px rgba(0,0,0,.08)}.card{padding:15px}.card h3{font-size:14px;color:#6b7280;margin:0 0 6px}.num{font-size:25px;font-weight:bold}.panel,.controls{padding:14px;display:flex;gap:10px;flex-wrap:wrap;margin-bottom:18px;align-items:end}.panel{border-left:6px solid #16a34a}.panel h2{width:100%;color:#166534;margin:0}.controls input,.controls select,.panel input,.panel select{width:210px}.block-title{margin:26px 0 12px;background:#dbeafe;padding:12px;border-radius:10px;border-left:7px solid #1e3a8a}.block-title h2{margin:0}.floor-title{margin:18px 0 12px;border-left:6px solid #2563eb;padding-left:10px}.rooms{display:grid;grid-template-columns:repeat(auto-fit,minmax(285px,1fr));gap:16px}.room{padding:14px}.room h3{margin:0 0 12px}.beds{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}.bed{min-height:80px;border-radius:12px;color:white;text-align:left;padding:10px;font-weight:bold;box-shadow:inset 0 -3px 0 rgba(0,0,0,.12)}.vacant{background:#16a34a}.occupied{background:#dc2626}.reserved{background:#f97316}.bed small{display:block;font-weight:normal;margin-top:5px;opacity:.95}.legend{display:flex;gap:16px;margin:10px 0 18px;font-weight:bold;flex-wrap:wrap}.dot{width:18px;height:18px;border-radius:50%;display:inline-block;margin-right:6px;vertical-align:middle}.dg{background:#16a34a}.dr{background:#dc2626}.do{background:#f97316}.tabs{display:flex;gap:8px;margin:10px 0 15px;flex-wrap:wrap}.tab{background:#e5e7eb}.tab.active{background:#2563eb;color:white}table{width:100%;border-collapse:collapse;background:white;border-radius:12px;overflow:hidden;box-shadow:0 2px 10px rgba(0,0,0,.08)}th,td{padding:10px;border-bottom:1px solid #e5e7eb;text-align:left;font-size:14px}th{background:#1e3a8a;color:white}.modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);justify-content:center;align-items:center;padding:18px;z-index:50}.modal-content{background:white;width:100%;max-width:760px;border-radius:14px;padding:20px;max-height:92vh;overflow:auto}.modal-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}.modal-head h2{margin:0}.close{font-size:26px;cursor:pointer;font-weight:bold}.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.full{grid-column:1/-1}.modal-actions{display:flex;gap:10px;justify-content:flex-end;margin-top:16px;flex-wrap:wrap}.checks{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:6px;width:420px;max-width:100%;background:#f9fafb;padding:8px;border-radius:8px;border:1px solid #e5e7eb}.checks label{font-weight:normal}.sync{display:none;position:fixed;right:18px;bottom:18px;background:#111827;color:white;padding:12px 16px;border-radius:10px;z-index:100}@media(max-width:700px){.form-grid{grid-template-columns:1fr}.controls input,.controls select,.panel input,.panel select{width:100%}.checks{width:100%}}
+*{box-sizing:border-box}body{margin:0;font-family:Arial,sans-serif;background:#f3f6f9;color:#1f2937}
+.login-page{min-height:100vh;display:flex;justify-content:center;align-items:center;padding:20px;background:linear-gradient(135deg,#1e3a8a,#2563eb)}
+.login-box{background:white;width:100%;max-width:400px;padding:28px;border-radius:18px;box-shadow:0 12px 35px rgba(0,0,0,.25)}
+.login-box h1{margin:0 0 8px;color:#1e3a8a;text-align:center}.login-box p{text-align:center;color:#6b7280}
+#error{display:none;background:#fee2e2;color:#991b1b;padding:10px;border-radius:8px;margin-bottom:12px;font-weight:bold;text-align:center}
+#app{display:none}header{background:#1e3a8a;color:white;padding:16px 22px;display:flex;justify-content:space-between;gap:10px;align-items:center;flex-wrap:wrap}
+header h1{margin:0;font-size:21px}.top{display:flex;gap:8px;flex-wrap:wrap;align-items:center}.badge{background:rgba(255,255,255,.15);padding:8px 10px;border-radius:8px;font-size:13px}
+.container{padding:20px;max-width:1350px;margin:auto}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:14px;margin-bottom:18px}
+.card{background:white;padding:15px;border-radius:12px;box-shadow:0 2px 10px rgba(0,0,0,.08)}.card h3{margin:0 0 7px;font-size:14px;color:#6b7280}.num{font-size:25px;font-weight:bold}
+button,.btn{border:0;padding:10px 13px;border-radius:8px;cursor:pointer;font-weight:bold}.primary{background:#2563eb;color:white}.danger{background:#dc2626;color:white}.gray{background:#e5e7eb;color:#111827}.green{background:#16a34a;color:white}.white{background:white;color:#1e3a8a}.orange{background:#f97316;color:white}
+.panel,.controls{background:white;padding:14px;border-radius:12px;box-shadow:0 2px 10px rgba(0,0,0,.08);display:flex;flex-wrap:wrap;gap:10px;margin-bottom:18px;align-items:end}.panel{border-left:6px solid #16a34a}
+.panel h2{width:100%;margin:0;color:#166534}.hint{width:100%;font-size:13px;color:#6b7280}
+label{font-size:13px;font-weight:bold;color:#374151}.field{display:flex;flex-direction:column;gap:5px;margin-bottom:8px}
+input,select,textarea{padding:10px;border:1px solid #d1d5db;border-radius:8px;font-size:14px;width:100%}.panel input,.panel select,.controls input,.controls select{width:210px}
+.block-title{margin:26px 0 12px;background:#dbeafe;padding:12px;border-radius:10px;border-left:7px solid #1e3a8a;display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}.block-title h2{margin:0}
+.floor-title{margin:18px 0 12px;border-left:6px solid #2563eb;padding-left:10px}.rooms{display:grid;grid-template-columns:repeat(auto-fit,minmax(285px,1fr));gap:16px}.room{background:white;border-radius:14px;padding:14px;box-shadow:0 2px 10px rgba(0,0,0,.08)}
+.room-head{display:flex;justify-content:space-between;gap:8px;margin-bottom:12px}.room-head h3{margin:0}.mini{padding:6px 8px;font-size:12px}.actions{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
+.beds{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}.bed{min-height:80px;border:0;border-radius:12px;color:white;cursor:pointer;padding:10px;text-align:left;font-weight:bold;box-shadow:inset 0 -3px 0 rgba(0,0,0,.12)}
+.vacant{background:#16a34a}.occupied{background:#dc2626}.reserved{background:#f97316}.bed small{display:block;font-weight:normal;margin-top:5px;opacity:.95}
+.legend{display:flex;gap:16px;margin:10px 0 18px;font-weight:bold;flex-wrap:wrap}.dot{width:18px;height:18px;border-radius:50%;display:inline-block;margin-right:6px;vertical-align:middle}.dg{background:#16a34a}.dr{background:#dc2626}.do{background:#f97316}
+.modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);justify-content:center;align-items:center;padding:18px;z-index:50}.modal-content{background:white;width:100%;max-width:720px;border-radius:14px;padding:20px;max-height:92vh;overflow:auto}.modal-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}.modal-head h2{margin:0}.close{font-size:26px;cursor:pointer;font-weight:bold}.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.full{grid-column:1/-1}.modal-actions{display:flex;gap:10px;justify-content:flex-end;margin-top:16px;flex-wrap:wrap}
+table{width:100%;border-collapse:collapse;background:white;border-radius:12px;overflow:hidden;box-shadow:0 2px 10px rgba(0,0,0,.08)}th,td{padding:10px;border-bottom:1px solid #e5e7eb;text-align:left;font-size:14px}th{background:#1e3a8a;color:white}
+.tabs{display:flex;gap:8px;margin:10px 0 15px;flex-wrap:wrap}.tab{background:#e5e7eb}.tab.active{background:#2563eb;color:white}
+.checks{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:6px;width:420px;max-width:100%;background:#f9fafb;padding:8px;border-radius:8px;border:1px solid #e5e7eb}.checks label{font-weight:normal}
+#loadingOverlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:100;justify-content:center;align-items:center;flex-direction:column;gap:14px}
+.spinner{width:48px;height:48px;border:5px solid rgba(255,255,255,.3);border-top-color:white;border-radius:50%;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+#loadingMsg{color:white;font-size:16px;font-weight:bold}
+@media(max-width:700px){.form-grid{grid-template-columns:1fr}.panel input,.panel select,.controls input,.controls select{width:100%}.checks{width:100%}}
+@media print{header,.panel,.controls,.legend,.top,.tabs{display:none!important}body{background:white}.card,.room,table{box-shadow:none;border:1px solid #ddd}}
 </style>
 </head>
 <body>
-<div class="sync" id="syncBox">Syncing...</div>
-<div class="login-page" id="loginPage"><div class="login-box"><h1>Hostel Login</h1><p class="muted" style="text-align:center">Google Sheets Cloud Sync</p><div class="error" id="loginError">Invalid username or password</div><div class="field"><label>Username</label><input id="loginUsername" placeholder="admin"></div><div class="field"><label>Password</label><input id="loginPassword" type="password" placeholder="1234"></div><button class="primary" style="width:100%" onclick="login()">Login</button><p class="muted" style="text-align:center">Default: admin / 1234</p></div></div>
-<div id="app"><header><h1>Hostel Room Allotment</h1><div class="top"><span class="badge" id="loggedUser"></span><button class="gray" onclick="pullFromCloud()">Refresh Cloud</button><button class="green" onclick="pushToCloud()">Save Cloud</button><button class="gray" onclick="downloadJSON()">Backup JSON</button><button class="white" onclick="logout()">Logout</button></div></header>
+
+<!-- Loading Overlay -->
+<div id="loadingOverlay" style="display:flex">
+  <div class="spinner"></div>
+  <div id="loadingMsg">Connecting to Google Sheets...</div>
+</div>
+
+<div class="login-page" id="loginPage" style="display:none">
+ <div class="login-box">
+  <h1>Hostel Login</h1><p>Room Allotment with Block Permissions</p><div id="error">Invalid username or password</div>
+  <div class="field"><label>Username</label><input id="loginUsername" placeholder="admin"></div>
+  <div class="field"><label>Password</label><input id="loginPassword" type="password" placeholder="1234"></div>
+  <button class="primary" style="width:100%" onclick="login()">Login</button>
+  <p style="font-size:12px;color:#6b7280;text-align:center">Contact admin for credentials</p>
+ </div>
+</div>
+
+<div id="app">
+<header>
+ <h1>Hostel Room Allotment</h1>
+ <div class="top">
+  <span class="badge" id="loggedUser"></span>
+  <button class="gray" onclick="downloadBackup()">Backup</button>
+  <button class="gray" onclick="document.getElementById('restoreFile').click()">Restore</button>
+  <input type="file" id="restoreFile" accept=".json" style="display:none" onchange="restoreBackup(event)">
+  <button class="gray" onclick="exportCSV()">CSV</button>
+  <button class="white" onclick="window.print()">Print</button>
+  <button class="white" onclick="logout()">Logout</button>
+ </div>
+</header>
+
 <div class="container">
-<div class="summary"><div class="card"><h3>Total Beds</h3><div class="num" id="totalBeds">0</div></div><div class="card"><h3>Occupied</h3><div class="num" id="occupiedBeds">0</div></div><div class="card"><h3>Vacant</h3><div class="num" id="vacantBeds">0</div></div><div class="card"><h3>Reserved</h3><div class="num" id="reservedBeds">0</div></div><div class="card"><h3>Fee Pending</h3><div class="num" id="feePending">0</div></div></div>
-<div class="panel" id="adminPanel" style="display:none"><h2>Admin Layout Controls</h2><div class="field"><label>Block</label><input id="newBlock" placeholder="Girls Hostel"></div><div class="field"><label>Floor</label><input id="newFloor" placeholder="Ground Floor"></div><div class="field"><label>Room</label><input id="newRoom" placeholder="101"></div><div class="field"><label>Beds</label><input id="newBeds" type="number" min="1" value="4"></div><button class="green" onclick="addOrUpdateRoom()">Add / Update Room</button><button class="danger" onclick="deleteRoomLayout()">Delete Room</button><button class="danger" onclick="deleteFloorLayout()">Delete Floor</button><button class="danger" onclick="deleteBlockLayout()">Delete Block</button></div>
-<div class="panel" id="permissionPanel" style="display:none;border-left-color:#f97316"><h2>Warden Permissions</h2><div class="field"><label>Name</label><input id="wardenName"></div><div class="field"><label>Username</label><input id="wardenUsername"></div><div class="field"><label>Password</label><input id="wardenPassword"></div><div class="field full"><label>Allowed Blocks</label><div id="blockChecks" class="checks"></div></div><button class="green" onclick="saveWarden()">Save Warden</button><div class="field"><label>Edit Warden</label><select id="wardenSelect" onchange="loadWardenForEdit()"></select></div><button class="danger" onclick="deleteWarden()">Delete Warden</button></div>
-<div class="panel" id="csvPanel" style="display:none;border-left-color:#2563eb"><h2>CSV Export</h2><button class="gray" onclick="downloadCSV('Users')">Users CSV</button><button class="gray" onclick="downloadCSV('Layout')">Layout CSV</button><button class="gray" onclick="downloadCSV('Beds')">Beds CSV</button><button class="gray" onclick="downloadCSV('History')">History CSV</button></div>
-<div class="controls"><input id="search" placeholder="Search name / admission / phone / ID" oninput="render()"><select id="blockFilter" onchange="render()"><option value="">All Blocks</option></select><select id="floorFilter" onchange="render()"><option value="">All Floors</option></select><select id="statusFilter" onchange="render()"><option value="">All Status</option><option value="vacant">Vacant</option><option value="occupied">Occupied</option><option value="reserved">Reserved</option></select><select id="feeFilter" onchange="render()"><option value="">All Fee Status</option><option value="Paid">Paid</option><option value="Pending">Pending</option><option value="Partial">Partial</option></select></div>
-<div class="legend"><span><span class="dot dg"></span>Vacant</span><span><span class="dot dr"></span>Occupied</span><span><span class="dot do"></span>Reserved</span></div>
-<div class="tabs"><button class="tab active" id="tabLayout" onclick="showTab('layout')">Room Layout</button><button class="tab" id="tabList" onclick="showTab('list')">Occupant List</button><button class="tab" id="tabUsers" onclick="showTab('users')">Users</button><button class="tab" id="tabHistory" onclick="showTab('history')">Checkout History</button></div>
-<div id="layoutView"><div id="layoutBox"></div></div><div id="listView" style="display:none"><div id="studentList"></div></div><div id="usersView" style="display:none"><div id="usersList"></div></div><div id="historyView" style="display:none"><div id="historyList"></div></div>
-</div></div>
-<div class="modal" id="bedModal"><div class="modal-content"><div class="modal-head"><h2 id="modalTitle">Bed Details</h2><span class="close" onclick="closeModal()">&times;</span></div><div class="form-grid"><div class="field"><label>Status</label><select id="status"><option value="vacant">Vacant</option><option value="occupied">Occupied</option><option value="reserved">Reserved</option></select></div><div class="field"><label>Fee Status</label><select id="feeStatus"><option>Paid</option><option>Pending</option><option>Partial</option></select></div><div class="field"><label>Admission No.</label><input id="admissionNo"></div><div class="field"><label>Student Name</label><input id="studentName"></div><div class="field"><label>Phone</label><input id="phone"></div><div class="field"><label>Guardian</label><input id="guardian"></div><div class="field"><label>ID Proof Type</label><select id="idType"><option>Aadhaar</option><option>Voter ID</option><option>Passport</option><option>Other</option></select></div><div class="field"><label>ID Proof No.</label><input id="idNo"></div><div class="field"><label>Joining Date</label><input id="joinDate" type="date"></div><div class="field"><label>Monthly Fee</label><input id="monthlyFee" type="number"></div><div class="field full"><label>Transfer to another vacant bed</label><select id="transferBed"><option value="">No transfer</option></select></div><div class="field full"><label>Address / Notes</label><textarea id="notes" rows="3"></textarea></div></div><div class="modal-actions"><button class="orange" onclick="checkoutBed()">Checkout</button><button class="danger" onclick="makeVacant()">Make Vacant</button><button class="primary" onclick="saveBed()">Save</button><button class="gray" onclick="closeModal()">Close</button></div></div></div>
+ <div class="grid">
+  <div class="card"><h3>Total Beds</h3><div class="num" id="totalBeds">0</div></div>
+  <div class="card"><h3>Occupied</h3><div class="num" id="occupiedBeds">0</div></div>
+  <div class="card"><h3>Vacant</h3><div class="num" id="vacantBeds">0</div></div>
+  <div class="card"><h3>Reserved</h3><div class="num" id="reservedBeds">0</div></div>
+  <div class="card"><h3>Fee Pending</h3><div class="num" id="feePending">0</div></div>
+ </div>
+
+ <div class="panel" id="adminPanel" style="display:none">
+  <h2>Admin Layout Controls</h2><div class="hint">Admin can add/delete blocks, floors, rooms and beds.</div>
+  <div class="field"><label>Add Block</label><input id="newBlock" placeholder="A Block"></div><button class="green" onclick="addBlock()">Add Block</button>
+  <div class="field"><label>Select Block</label><select id="adminBlock" onchange="refreshAdminSelectors()"></select></div><button class="danger" onclick="deleteSelectedBlock()">Delete Block</button>
+  <div class="field"><label>Add Floor</label><input id="newFloor" placeholder="Ground Floor"></div><button class="green" onclick="addFloor()">Add Floor</button>
+  <div class="field"><label>Select Floor</label><select id="adminFloor" onchange="refreshAdminSelectors()"></select></div><button class="danger" onclick="deleteSelectedFloor()">Delete Floor</button>
+  <div class="field"><label>Room No.</label><input id="newRoom" placeholder="101"></div>
+  <div class="field"><label>Beds</label><input id="newBeds" type="number" min="1" value="4"></div><button class="green" onclick="addRoom()">Add Room</button>
+  <div class="field"><label>Select Room</label><select id="adminRoom"></select></div><button class="primary" onclick="addOneBed()">Add 1 Bed</button><button class="danger" onclick="deleteSelectedRoom()">Delete Room</button>
+ </div>
+
+ <div class="panel" id="permissionPanel" style="display:none;border-left-color:#f97316">
+  <h2>Warden Permission Controls</h2>
+  <div class="hint">Create wardens and assign which blocks they can access. Wardens cannot see other blocks.</div>
+  <div class="field"><label>Warden Name</label><input id="wardenName" placeholder="Example: Warden 1"></div>
+  <div class="field"><label>Username</label><input id="wardenUsername" placeholder="warden1"></div>
+  <div class="field"><label>Password</label><input id="wardenPassword" placeholder="1234"></div>
+  <div class="field full"><label>Allowed Blocks</label><div id="blockChecks" class="checks"></div></div>
+  <button class="green" onclick="saveWarden()">Save / Update Warden</button>
+  <div class="field"><label>Edit Existing Warden</label><select id="wardenSelect" onchange="loadWardenForEdit()"></select></div>
+  <button class="danger" onclick="deleteWarden()">Delete Warden</button>
+  <div id="wardenList" class="full"></div>
+ </div>
+
+ <div class="controls">
+  <input id="search" placeholder="Search name / admission / phone / ID" oninput="render()">
+  <select id="blockFilter" onchange="render()"><option value="">All Blocks</option></select>
+  <select id="floorFilter" onchange="render()"><option value="">All Floors</option></select>
+  <select id="statusFilter" onchange="render()"><option value="">All Status</option><option value="vacant">Vacant</option><option value="occupied">Occupied</option><option value="reserved">Reserved</option></select>
+  <select id="feeFilter" onchange="render()"><option value="">All Fee Status</option><option value="Paid">Paid</option><option value="Pending">Pending</option><option value="Partial">Partial</option></select>
+ </div>
+
+ <div class="legend"><span><span class="dot dg"></span>Vacant</span><span><span class="dot dr"></span>Occupied</span><span><span class="dot do"></span>Reserved</span></div>
+
+ <div class="tabs">
+  <button class="tab active" id="tabLayout" onclick="showTab('layout')">Room Layout</button>
+  <button class="tab" id="tabList" onclick="showTab('list')">Occupant List</button>
+  <button class="tab" id="tabHistory" onclick="showTab('history')">Checkout History</button>
+ </div>
+
+ <div id="layoutView"><div id="layoutBox"></div></div>
+ <div id="listView" style="display:none"><div id="studentList"></div></div>
+ <div id="historyView" style="display:none"><div id="historyList"></div></div>
+</div>
+</div>
+
+<div class="modal" id="bedModal">
+ <div class="modal-content">
+  <div class="modal-head"><h2 id="modalTitle">Bed Details</h2><span class="close" onclick="closeModal()">&times;</span></div>
+  <div class="form-grid">
+   <div class="field"><label>Status</label><select id="status"><option value="vacant">Vacant</option><option value="occupied">Occupied</option><option value="reserved">Reserved</option></select></div>
+   <div class="field"><label>Fee Status</label><select id="feeStatus"><option>Paid</option><option>Pending</option><option>Partial</option></select></div>
+   <div class="field"><label>Admission No.</label><input id="admissionNo"></div>
+   <div class="field"><label>Student Name</label><input id="studentName"></div>
+   <div class="field"><label>Phone</label><input id="phone"></div>
+   <div class="field"><label>Guardian</label><input id="guardian"></div>
+   <div class="field"><label>ID Proof Type</label><select id="idType"><option>Aadhaar</option><option>Voter ID</option><option>Passport</option><option>Other</option></select></div>
+   <div class="field"><label>ID Proof No.</label><input id="idNo"></div>
+   <div class="field"><label>Joining Date</label><input id="joinDate" type="date"></div>
+   <div class="field"><label>Monthly Fee</label><input id="monthlyFee" type="number" placeholder="Example: 6000"></div>
+   <div class="field full"><label>Transfer to another vacant allowed bed</label><select id="transferBed"><option value="">No transfer</option></select></div>
+   <div class="field full"><label>Address / Notes</label><textarea id="notes" rows="3"></textarea></div>
+  </div>
+  <div class="modal-actions">
+   <button class="orange" onclick="checkoutBed()">Checkout</button>
+   <button class="danger" onclick="makeVacant()">Make Vacant</button>
+   <button class="primary" onclick="saveBed()">Save</button>
+   <button class="gray" onclick="closeModal()">Close</button>
+  </div>
+ </div>
+</div>
 
 <script>
-const API_URL = "https://script.google.com/macros/s/AKfycbxaUj1bp3VV91_gq00oBo0echUv_jBkYe5QyYk9KmXMqsOUgcq1NKg8_041w58pdYtVwQ/exec";
+// ============================================================
+// CONFIGURATION — paste your deployed Apps Script URL here
+// ============================================================
+const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxI7IGLesoHFsxtR1U7nqpY0f_qDabpCR68oEkFld98-MxiafNKGajAFAka9rYAdUlZow/exec";
+// ============================================================
 
-const HEADERS={Users:["Username","Password","Name","Role","AllowedBlocks","Active"],Layout:["Block","Floor","Room","Beds"],Beds:["BedID","Block","Floor","Room","Bed","Status","FeeStatus","AdmissionNo","StudentName","Phone","Guardian","IdType","IdNo","JoinDate","MonthlyFee","Notes","UpdatedAt","UpdatedBy"],History:["DateTime","BedID","Block","Floor","Room","Bed","Status","FeeStatus","AdmissionNo","StudentName","Phone","Guardian","IdType","IdNo","JoinDate","MonthlyFee","Notes","CheckoutBy"]};
-let db=JSON.parse(localStorage.getItem("hostelDB")||"null")||{Users:[{Username:"admin",Password:"1234",Name:"Admin",Role:"admin",AllowedBlocks:"ALL",Active:"YES"},{Username:"warden",Password:"1234",Name:"Default Warden",Role:"warden",AllowedBlocks:"Girls Hostel",Active:"YES"}],Layout:[{Block:"Girls Hostel",Floor:"Ground Floor",Room:"101",Beds:"14"}],Beds:[],History:[]};
-let currentUser=null,selected=null;
+// ── In-memory state ──────────────────────────────────────────
+let currentUser = null;
+let selectedBedId = null;
+let hostelLayout = [];   // [{block, floors:[{floor, rooms:[{room,beds}]}]}]
+let bedData = {};        // { bedId: { status, studentName, ... } }
+let checkoutHistory = [];
+let wardens = [];
 
-function showSync(v){syncBox.style.display=v?"block":"none"}
-function saveLocal(){localStorage.setItem("hostelDB",JSON.stringify(db))}
-function esc(s){return String(s??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]))}
-function makeBedId(b,f,r,n){return [b,f,r,"B"+n].join("__")}
-function unique(a){return[...new Set(a.filter(Boolean).map(String))]}
-function isAdmin(){return currentUser&&String(currentUser.Role).toLowerCase()==="admin"}
-function allowedBlocks(){if(!currentUser)return[];if(isAdmin())return unique(db.Layout.map(r=>r.Block));return String(currentUser.AllowedBlocks||"").split(",").map(x=>x.trim()).filter(Boolean)}
-function canAccessBlock(b){return isAdmin()||allowedBlocks().includes(String(b))}
-function accessibleLayout(){return db.Layout.filter(r=>canAccessBlock(r.Block))}
-function getBedRecord(id){return db.Beds.find(b=>String(b.BedID)===String(id))||null}
+// ── Loading overlay ──────────────────────────────────────────
+function showLoading(msg){ loadingOverlay.style.display="flex"; loadingMsg.textContent=msg||"Loading..."; }
+function hideLoading(){ loadingOverlay.style.display="none"; }
 
-async function pullFromCloud(){
- if(API_URL.includes("PASTE_")){alert("Paste Apps Script URL in API_URL first.");return}
- showSync(true);
- try{
-  const res=await fetch(API_URL+"?ts="+Date.now());
-  const json=await res.json();
-  if(json.result==="success"&&json.data){db=json.data;saveLocal();refreshAll()}
-  else alert("Cloud error: "+(json.error||"unknown"));
- }catch(e){alert("Cloud fetch error: "+e.message)}
- showSync(false);
+// ── Bootstrap ────────────────────────────────────────────────
+async function init(){
+  showLoading("Connecting to Google Sheets...");
+  try {
+    const data = await apiGet("getData");
+    applyServerData(data);
+    hideLoading();
+    const saved = sessionStorage.getItem("hostelSession");
+    if(saved){ const u = JSON.parse(saved); const fresh = allUsers().find(x=>x.username===u.username)||u; showApp(fresh); }
+    else { loginPage.style.display="flex"; }
+  } catch(e){
+    hideLoading();
+    alert("Could not connect to Google Sheets.\nCheck APPS_SCRIPT_URL.\n\n"+e.message);
+    loginPage.style.display="flex";
+  }
 }
 
-async function pushToCloud(){
- if(API_URL.includes("PASTE_")){alert("Paste Apps Script URL in API_URL first.");return}
- showSync(true);
- try{
-  await fetch(API_URL,{method:"POST",mode:"no-cors",headers:{"Content-Type":"application/json"},body:JSON.stringify({action:"saveAll",data:JSON.stringify(db)})});
- }catch(e){console.error(e)}
- showSync(false);
+function applyServerData(data){
+  hostelLayout = data.layout || [];
+  wardens = data.wardens || [];
+  // bedData: array of rows → keyed object
+  bedData = {};
+  (data.bedData || []).forEach(row => {
+    if(row.bedID) bedData[row.bedID] = {
+      status: row.status || "vacant",
+      admissionNo: row.admissionNo || "",
+      studentName: row.studentName || "",
+      phone: row.phone || "",
+      guardian: row.guardian || "",
+      idType: row.idType || "Aadhaar",
+      idNo: row.idNo || "",
+      joinDate: row.joinDate || "",
+      monthlyFee: row.monthlyFee || "",
+      feeStatus: row.feeStatus || "Paid",
+      notes: row.notes || "",
+      updatedAt: row.updatedAt || "",
+      updatedBy: row.updatedBy || ""
+    };
+  });
+  checkoutHistory = data.history || [];
 }
 
-function saveDB(){saveLocal();refreshAll();pushToCloud()}
+// ── API helpers ───────────────────────────────────────────────
+async function apiGet(action, params={}){
+  const qs = new URLSearchParams({action, ...params}).toString();
+  const res = await fetch(`${APPS_SCRIPT_URL}?${qs}`);
+  const json = await res.json();
+  if(json.error) throw new Error(json.error);
+  return json;
+}
+
+async function apiPost(action, payload={}){
+  const body = JSON.stringify({action, ...payload});
+  const res = await fetch(APPS_SCRIPT_URL, {
+    method:"POST",
+    headers:{"Content-Type":"application/json"},
+    body
+  });
+  const json = await res.json();
+  if(json.error) throw new Error(json.error);
+  return json;
+}
+
+// Reload all data from Sheets and re-render
+async function syncAndRender(loadingText){
+  showLoading(loadingText||"Syncing...");
+  try {
+    const data = await apiGet("getData");
+    applyServerData(data);
+    refreshAll();
+  } catch(e){ alert("Sync failed: "+e.message); }
+  hideLoading();
+}
+
+// ── Auth ──────────────────────────────────────────────────────
+function allUsers(){ return [{username:"admin",password:"admin123",name:"Admin",role:"admin",allowedBlocks:["ALL"]}, ...wardens]; }
 
 async function login(){
- const u=loginUsername.value.trim(),p=loginPassword.value.trim();
- await pullFromCloud();
- const user=db.Users.find(x=>String(x.Username).trim()===u&&String(x.Password).trim()===p&&String(x.Active).toUpperCase()==="YES");
- if(!user){loginError.style.display="block";return}
- currentUser=user;sessionStorage.setItem("hostelUser",JSON.stringify(user));
- loginPage.style.display="none";app.style.display="block";loggedUser.textContent=user.Name+" ("+user.Role+")";
- const a=isAdmin();adminPanel.style.display=a?"flex":"none";permissionPanel.style.display=a?"flex":"none";csvPanel.style.display=a?"flex":"none";
- refreshAll();
+  const u = loginUsername.value.trim(), p = loginPassword.value.trim();
+  showLoading("Authenticating...");
+  try {
+    // Re-fetch users from sheet in case they changed
+    const data = await apiGet("getData");
+    applyServerData(data);
+    const user = allUsers().find(x => x.username===u && x.password===p);
+    hideLoading();
+    if(!user){ error.style.display="block"; return; }
+    sessionStorage.setItem("hostelSession", JSON.stringify(user));
+    showApp(user);
+  } catch(e){ hideLoading(); error.style.display="block"; }
 }
 
-function logout(){sessionStorage.removeItem("hostelUser");location.reload()}
-function refreshAll(){refreshFilters();refreshPermissionPanel();render()}
+function logout(){ sessionStorage.removeItem("hostelSession"); location.reload(); }
 
-function refreshFilters(){blockFilter.innerHTML='<option value="">All Blocks</option>';floorFilter.innerHTML='<option value="">All Floors</option>';unique(accessibleLayout().map(r=>r.Block)).forEach(b=>blockFilter.add(new Option(b,b)));unique(accessibleLayout().map(r=>r.Floor)).forEach(f=>floorFilter.add(new Option(f,f)))}
-function groupedLayout(){const g={};accessibleLayout().forEach(r=>{const b=String(r.Block),f=String(r.Floor);if(!g[b])g[b]={};if(!g[b][f])g[b][f]=[];g[b][f].push({Room:String(r.Room),Beds:Number(r.Beds||1)})});return g}
+function showApp(user){
+  currentUser = user;
+  loginPage.style.display = "none";
+  app.style.display = "block";
+  loggedUser.textContent = `${user.name} (${user.role})`;
+  adminPanel.style.display = user.role==="admin" ? "flex" : "none";
+  permissionPanel.style.display = user.role==="admin" ? "flex" : "none";
+  refreshAll();
+}
 
+function isAdmin(){ return currentUser && currentUser.role==="admin"; }
+function allowedBlocks(){ return isAdmin() ? hostelLayout.map(b=>b.block) : (currentUser.allowedBlocks||[]); }
+function canAccessBlock(block){ return isAdmin() || allowedBlocks().includes(block); }
+function accessibleLayout(){ return hostelLayout.filter(b=>canAccessBlock(b.block)); }
+
+// ── Bed ID helpers ────────────────────────────────────────────
+function bedId(b,f,r,n){ return `${b}__${f}__${r}__B${n}`; }
+function splitId(id){ const p=id.split("__"); return {block:p[0],floor:p[1],room:p[2],bed:p[3]}; }
+function clean(s){ return String(s).replaceAll("__","_").trim(); }
+
+// ── Render ────────────────────────────────────────────────────
 function render(){
- const q=search.value.toLowerCase(),bf=blockFilter.value,ff=floorFilter.value,sf=statusFilter.value,fee=feeFilter.value;
- let total=0,occ=0,vac=0,res=0,pending=0;layoutBox.innerHTML="";
- const groups=groupedLayout();
- Object.keys(groups).forEach(block=>{if(bf&&block!==bf)return;const bd=document.createElement("div");bd.innerHTML=`<div class="block-title"><h2>${esc(block)}</h2></div>`;
-  Object.keys(groups[block]).forEach(floor=>{if(ff&&floor!==ff)return;const ft=document.createElement("h3");ft.className="floor-title";ft.textContent=floor;bd.appendChild(ft);const rooms=document.createElement("div");rooms.className="rooms";
-   groups[block][floor].forEach(room=>{const rd=document.createElement("div");rd.className="room";rd.innerHTML=`<h3>Room ${esc(room.Room)} - ${room.Beds} Beds</h3>`;const bedsDiv=document.createElement("div");bedsDiv.className="beds";
-    for(let i=1;i<=room.Beds;i++){total++;const id=makeBedId(block,floor,room.Room,i);const info=getBedRecord(id)||{Status:"vacant"};const st=String(info.Status||"vacant").toLowerCase();
-     if(st==="occupied")occ++;else if(st==="reserved")res++;else vac++;
-     if(info.FeeStatus==="Pending"||info.FeeStatus==="Partial")pending++;
-     const hay=`${info.StudentName||""} ${info.AdmissionNo||""} ${info.Phone||""} ${info.IdNo||""}`.toLowerCase();
-     if(q&&st==="vacant")continue;if(q&&!hay.includes(q))continue;if(sf&&st!==sf)continue;if(fee&&info.FeeStatus!==fee)continue;
-     const btn=document.createElement("button");btn.className="bed "+st;btn.onclick=()=>openBed({BedID:id,Block:block,Floor:floor,Room:room.Room,Bed:i});btn.innerHTML=`Bed ${i}<small>${st==="vacant"?"Vacant":esc(info.StudentName||st)}</small><small>${esc(info.AdmissionNo||info.FeeStatus||"Click to allot")}</small>`;bedsDiv.appendChild(btn)}
-    rd.appendChild(bedsDiv);rooms.appendChild(rd)});
-   bd.appendChild(rooms)});
-  layoutBox.appendChild(bd)});
- totalBeds.textContent=total;occupiedBeds.textContent=occ;vacantBeds.textContent=vac;reservedBeds.textContent=res;feePending.textContent=pending;showList();showUsers();showHistory();
+  const q=search.value.toLowerCase(), bf=blockFilter.value, ff=floorFilter.value, sf=statusFilter.value, fee=feeFilter.value;
+  let total=0, occ=0, vac=0, res=0, pending=0;
+  layoutBox.innerHTML="";
+
+  accessibleLayout().forEach(block => {
+    if(bf && block.block!==bf) return;
+    const blockDiv = document.createElement("div");
+    const bh = document.createElement("div");
+    bh.className = "block-title";
+    bh.innerHTML = `<h2>${esc(block.block)}</h2>`;
+    if(isAdmin()){
+      const del = document.createElement("button");
+      del.className="danger"; del.textContent="Delete Block";
+      del.onclick=()=>deleteBlock(block.block); bh.appendChild(del);
+    }
+    blockDiv.appendChild(bh);
+
+    block.floors.forEach(floor => {
+      if(ff && floor.floor!==ff) return;
+      const ft = document.createElement("h3");
+      ft.className="floor-title"; ft.textContent=floor.floor; blockDiv.appendChild(ft);
+      const rooms = document.createElement("div"); rooms.className="rooms";
+
+      floor.rooms.forEach(room => {
+        const rd = document.createElement("div"); rd.className="room";
+        const head = document.createElement("div"); head.className="room-head";
+        head.innerHTML=`<h3>Room ${esc(room.room)} - ${room.beds} Beds</h3>`;
+        if(isAdmin()){
+          const act=document.createElement("div"); act.className="actions";
+          const ab=document.createElement("button"); ab.className="mini primary"; ab.textContent="+ Bed"; ab.onclick=()=>addBedFromRoom(block.block,floor.floor,room.room);
+          const db=document.createElement("button"); db.className="mini danger"; db.textContent="Delete Room"; db.onclick=()=>deleteRoom(block.block,floor.floor,room.room);
+          act.append(ab,db); head.appendChild(act);
+        }
+        rd.appendChild(head);
+        const bedsDiv = document.createElement("div"); bedsDiv.className="beds";
+
+        for(let i=1; i<=room.beds; i++){
+          total++;
+          const id = bedId(block.block, floor.floor, room.room, i);
+          // ── FIX: always read from bedData; default to vacant if missing ──
+          const info = bedData[id] || {status:"vacant"};
+          const st = info.status || "vacant";
+
+          // ── Counters ──
+          if(st==="occupied") occ++;
+          else if(st==="reserved") res++;
+          else vac++;
+          if(info.feeStatus==="Pending" || info.feeStatus==="Partial") pending++;
+
+          // ── Search / filter ──
+          const hay = `${info.studentName||""} ${info.admissionNo||""} ${info.phone||""} ${info.idNo||""}`.toLowerCase();
+          if(q && !hay.includes(q) && st!=="vacant") continue;
+          if(q && st==="vacant") continue;
+          if(sf && st!==sf) continue;
+          if(fee && info.feeStatus!==fee) continue;
+
+          // ── Bed button — class derived from status directly ──
+          const btn = document.createElement("button");
+          // Always use the current status to set the colour class
+          btn.className = `bed ${st}`;
+          btn.onclick = ()=>openBed(id, block.block, floor.floor, room.room, i);
+          btn.innerHTML = `Bed ${i}<small>${st==="vacant"?"Vacant":esc(info.studentName||st)}</small><small>${esc(info.admissionNo||info.feeStatus||"Click to allot")}</small>`;
+          bedsDiv.appendChild(btn);
+        }
+        rd.appendChild(bedsDiv); rooms.appendChild(rd);
+      });
+      blockDiv.appendChild(rooms);
+    });
+    layoutBox.appendChild(blockDiv);
+  });
+
+  // ── Stats ──
+  totalBeds.textContent  = total;
+  occupiedBeds.textContent = occ;
+  vacantBeds.textContent   = vac;
+  reservedBeds.textContent = res;
+  feePending.textContent   = pending;
+
+  showList(); showHistory();
 }
 
-function openBed(bed){selected=bed;const info=getBedRecord(bed.BedID)||{};modalTitle.textContent=`${bed.Block} / ${bed.Floor} / Room ${bed.Room} / Bed ${bed.Bed}`;status.value=String(info.Status||"vacant").toLowerCase();feeStatus.value=info.FeeStatus||"Paid";admissionNo.value=info.AdmissionNo||"";studentName.value=info.StudentName||"";phone.value=info.Phone||"";guardian.value=info.Guardian||"";idType.value=info.IdType||"Aadhaar";idNo.value=info.IdNo||"";joinDate.value=info.JoinDate||"";monthlyFee.value=info.MonthlyFee||"";notes.value=info.Notes||"";fillTransferBeds(bed.BedID);bedModal.style.display="flex"}
-function fillTransferBeds(cur){transferBed.innerHTML='<option value="">No transfer</option>';accessibleLayout().forEach(r=>{for(let i=1;i<=Number(r.Beds||1);i++){const id=makeBedId(r.Block,r.Floor,String(r.Room),i);const rec=getBedRecord(id);if(id!==cur&&(!rec||String(rec.Status).toLowerCase()==="vacant"))transferBed.add(new Option(`${r.Block} / ${r.Floor} / Room ${r.Room} / Bed ${i}`,JSON.stringify({Block:r.Block,Floor:r.Floor,Room:String(r.Room),Bed:i,BedID:id})))}})}
-function closeModal(){bedModal.style.display="none";selected=null}
-
-function collectBed(bed){
- let finalStatus=String(status.value||"vacant").toLowerCase();
- if(studentName.value.trim()||admissionNo.value.trim()||phone.value.trim()) finalStatus="occupied";
- return{BedID:bed.BedID,Block:bed.Block,Floor:bed.Floor,Room:bed.Room,Bed:String(bed.Bed),Status:finalStatus,FeeStatus:feeStatus.value,AdmissionNo:admissionNo.value.trim(),StudentName:studentName.value.trim(),Phone:phone.value.trim(),Guardian:guardian.value.trim(),IdType:idType.value,IdNo:idNo.value.trim(),JoinDate:joinDate.value,MonthlyFee:monthlyFee.value,Notes:notes.value.trim(),UpdatedAt:new Date().toLocaleString(),UpdatedBy:currentUser.Username}
+// ── Bed modal ─────────────────────────────────────────────────
+function openBed(id,b,f,r,n){
+  if(!canAccessBlock(b)) return alert("No permission for this block.");
+  selectedBedId = id;
+  const info = bedData[id] || {status:"vacant", feeStatus:"Paid"};
+  modalTitle.textContent = `${b} / ${f} / Room ${r} / Bed ${n}`;
+  ["status","admissionNo","studentName","phone","guardian","idType","idNo","joinDate","monthlyFee","notes"]
+    .forEach(x => document.getElementById(x).value = info[x]||"");
+  feeStatus.value = info.feeStatus||"Paid";
+  fillTransfer(id);
+  bedModal.style.display="flex";
 }
 
-function saveBed(){
- if(!selected)return;
- const obj=collectBed(selected);
- if(transferBed.value){const t=JSON.parse(transferBed.value);obj.BedID=t.BedID;obj.Block=t.Block;obj.Floor=t.Floor;obj.Room=t.Room;obj.Bed=String(t.Bed);db.Beds=db.Beds.filter(b=>b.BedID!==selected.BedID&&b.BedID!==t.BedID);db.Beds.push(obj);db.Beds.push({BedID:selected.BedID,Block:selected.Block,Floor:selected.Floor,Room:selected.Room,Bed:String(selected.Bed),Status:"vacant",UpdatedAt:new Date().toLocaleString(),UpdatedBy:currentUser.Username})}
- else{db.Beds=db.Beds.filter(b=>b.BedID!==selected.BedID);db.Beds.push(obj)}
- closeModal();saveDB();
+function fillTransfer(current){
+  transferBed.innerHTML='<option value="">No transfer</option>';
+  accessibleLayout().forEach(b=>b.floors.forEach(f=>f.rooms.forEach(r=>{
+    for(let i=1;i<=r.beds;i++){
+      const id=bedId(b.block,f.floor,r.room,i);
+      const inf=bedData[id]||{status:"vacant"};
+      if(id!==current && inf.status==="vacant")
+        transferBed.add(new Option(`${b.block} / ${f.floor} / Room ${r.room} / Bed ${i}`, id));
+    }
+  })));
 }
 
-function makeVacant(){
- if(!selected)return;
- db.Beds=db.Beds.filter(b=>b.BedID!==selected.BedID);
- db.Beds.push({BedID:selected.BedID,Block:selected.Block,Floor:selected.Floor,Room:selected.Room,Bed:String(selected.Bed),Status:"vacant",UpdatedAt:new Date().toLocaleString(),UpdatedBy:currentUser.Username});
- closeModal();saveDB();
+function closeModal(){ bedModal.style.display="none"; selectedBedId=null; }
+
+async function saveBed(){
+  if(!selectedBedId) return;
+  const p = splitId(selectedBedId);
+  if(!canAccessBlock(p.block)) return alert("No permission.");
+
+  const obj = {
+    status: status.value,
+    feeStatus: feeStatus.value,
+    admissionNo: admissionNo.value.trim(),
+    studentName: studentName.value.trim(),
+    phone: phone.value.trim(),
+    guardian: guardian.value.trim(),
+    idType: idType.value,
+    idNo: idNo.value.trim(),
+    joinDate: joinDate.value,
+    monthlyFee: monthlyFee.value,
+    notes: notes.value.trim(),
+    updatedAt: new Date().toLocaleString(),
+    updatedBy: currentUser.username
+  };
+
+  const target = transferBed.value;
+  if(target && obj.status!=="vacant"){
+    const tp = splitId(target);
+    if(!canAccessBlock(tp.block)) return alert("No permission for target block.");
+    // ── Optimistic local update ──
+    bedData[target] = {...obj};
+    bedData[selectedBedId] = {status:"vacant"};
+    closeModal(); render();
+    // ── Persist to Sheets ──
+    showLoading("Saving transfer...");
+    try {
+      await apiPost("transferBed",{
+        fromBedId: selectedBedId, toBedId: target,
+        bedInfo: obj, updatedBy: currentUser.username,
+        ...p
+      });
+    } catch(e){ alert("Save failed: "+e.message); }
+    await syncAndRender("Refreshing...");
+  } else {
+    // ── Optimistic local update — this is the key fix ──
+    if(obj.status==="vacant"){
+      bedData[selectedBedId] = {status:"vacant"};
+    } else {
+      bedData[selectedBedId] = {...obj};
+    }
+    closeModal(); render();   // <-- render AFTER updating bedData in memory
+    // ── Persist to Sheets ──
+    showLoading("Saving...");
+    try {
+      await apiPost("saveBed",{
+        bedId: selectedBedId, bedInfo: obj,
+        updatedBy: currentUser.username, ...p
+      });
+    } catch(e){ alert("Save failed: "+e.message); }
+    await syncAndRender("Refreshing...");
+  }
 }
 
-function checkoutBed(){if(!selected)return;const info=getBedRecord(selected.BedID);if(!info||String(info.Status).toLowerCase()==="vacant"){alert("No occupant to checkout.");return}if(!confirm("Checkout student and move to history?"))return;db.History.unshift({DateTime:new Date().toLocaleString(),...info,CheckoutBy:currentUser.Username});makeVacant()}
+async function makeVacant(){
+  if(!selectedBedId) return;
+  const p = splitId(selectedBedId);
+  if(!canAccessBlock(p.block)) return alert("No permission.");
+  if(!confirm("Make this bed vacant?")) return;
+  bedData[selectedBedId] = {status:"vacant"};
+  closeModal(); render();
+  showLoading("Saving...");
+  try {
+    await apiPost("makeVacant",{ bedId: selectedBedId, updatedBy: currentUser.username, ...p });
+  } catch(e){ alert("Save failed: "+e.message); }
+  await syncAndRender("Refreshing...");
+}
 
-function addOrUpdateRoom(){const row={Block:newBlock.value.trim(),Floor:newFloor.value.trim(),Room:newRoom.value.trim(),Beds:String(newBeds.value||1)};if(!row.Block||!row.Floor||!row.Room)return alert("Enter block, floor and room.");db.Layout=db.Layout.filter(r=>!(r.Block===row.Block&&r.Floor===row.Floor&&String(r.Room)===String(row.Room)));db.Layout.push(row);saveDB()}
-function deleteRoomLayout(){const b=newBlock.value.trim(),f=newFloor.value.trim(),r=newRoom.value.trim();if(!b||!f||!r)return alert("Enter block, floor and room.");if(!confirm("Delete room?"))return;db.Layout=db.Layout.filter(x=>!(x.Block===b&&x.Floor===f&&String(x.Room)===String(r)));db.Beds=db.Beds.filter(x=>!(x.Block===b&&x.Floor===f&&String(x.Room)===String(r)));saveDB()}
-function deleteFloorLayout(){const b=newBlock.value.trim(),f=newFloor.value.trim();if(!b||!f)return alert("Enter block and floor.");if(!confirm("Delete floor?"))return;db.Layout=db.Layout.filter(x=>!(x.Block===b&&x.Floor===f));db.Beds=db.Beds.filter(x=>!(x.Block===b&&x.Floor===f));saveDB()}
-function deleteBlockLayout(){const b=newBlock.value.trim();if(!b)return alert("Enter block.");if(!confirm("Delete block?"))return;db.Layout=db.Layout.filter(x=>x.Block!==b);db.Beds=db.Beds.filter(x=>x.Block!==b);saveDB()}
+async function checkoutBed(){
+  if(!selectedBedId) return;
+  const p = splitId(selectedBedId);
+  if(!canAccessBlock(p.block)) return alert("No permission.");
+  const info = bedData[selectedBedId];
+  if(!info || info.status==="vacant") return alert("No occupant to checkout.");
+  if(!confirm("Checkout student and move to history?")) return;
+  const rec = {...p, ...info, checkoutDate: new Date().toLocaleDateString(), checkoutBy: currentUser.username};
+  checkoutHistory.unshift(rec);
+  bedData[selectedBedId] = {status:"vacant"};
+  closeModal(); render();
+  showLoading("Saving checkout...");
+  try {
+    await apiPost("checkoutBed",{ bedId: selectedBedId, bedInfo: info, ...p, checkoutBy: currentUser.username });
+  } catch(e){ alert("Save failed: "+e.message); }
+  await syncAndRender("Refreshing...");
+}
 
-function refreshPermissionPanel(){if(!isAdmin())return;const blocks=unique(db.Layout.map(r=>r.Block));blockChecks.innerHTML=blocks.map(b=>`<label><input type="checkbox" class="blockCheck" value="${esc(b)}"> ${esc(b)}</label>`).join("");wardenSelect.innerHTML='<option value="">Select warden</option>';db.Users.filter(u=>String(u.Role).toLowerCase()==="warden").forEach(w=>wardenSelect.add(new Option(`${w.Name} (${w.Username})`,w.Username)))}
-function saveWarden(){const blocks=[...document.querySelectorAll(".blockCheck:checked")].map(c=>c.value);if(!wardenName.value.trim()||!wardenUsername.value.trim()||!wardenPassword.value.trim())return alert("Enter details.");if(!blocks.length)return alert("Select blocks.");db.Users=db.Users.filter(u=>u.Username!==wardenUsername.value.trim());db.Users.push({Username:wardenUsername.value.trim(),Password:wardenPassword.value.trim(),Name:wardenName.value.trim(),Role:"warden",AllowedBlocks:blocks.join(", "),Active:"YES"});saveDB()}
-function loadWardenForEdit(){const w=db.Users.find(u=>u.Username===wardenSelect.value);if(!w)return;wardenName.value=w.Name;wardenUsername.value=w.Username;wardenPassword.value=w.Password;const a=String(w.AllowedBlocks||"").split(",").map(x=>x.trim());document.querySelectorAll(".blockCheck").forEach(c=>c.checked=a.includes(c.value))}
-function deleteWarden(){if(!wardenSelect.value)return alert("Select warden.");db.Users=db.Users.filter(u=>u.Username!==wardenSelect.value);saveDB()}
+// ── Layout admin ──────────────────────────────────────────────
+async function addBlock(){
+  if(!isAdmin()) return alert("Only admin");
+  const n=clean(newBlock.value);
+  if(!n) return alert("Enter block name");
+  if(hostelLayout.some(b=>b.block.toLowerCase()===n.toLowerCase())) return alert("Block exists");
+  hostelLayout.push({block:n, floors:[]});
+  newBlock.value=""; refreshAll();
+  showLoading("Saving layout...");
+  try { await apiPost("saveLayout",{layout:hostelLayout,updatedBy:currentUser.username}); } catch(e){ alert("Save failed: "+e.message); }
+  await syncAndRender("Refreshing...");
+}
 
-function showList(){const rows=db.Beds.filter(b=>canAccessBlock(b.Block)&&String(b.Status).toLowerCase()!=="vacant");studentList.innerHTML=rows.length?makeTable(rows,false):"<p>No occupied/reserved beds.</p>"}
-function showUsers(){usersList.innerHTML=isAdmin()?makeSimpleTable(db.Users,HEADERS.Users):"<p>Only admin can view users.</p>"}
-function showHistory(){const rows=db.History.filter(h=>canAccessBlock(h.Block));historyList.innerHTML=rows.length?makeTable(rows,true):"<p>No checkout history.</p>"}
-function makeTable(rows,hist){return `<table><thead><tr><th>Block</th><th>Floor</th><th>Room</th><th>Bed</th><th>Admission</th><th>Name</th><th>Phone</th><th>Fee</th><th>${hist?"Checkout":"Status"}</th></tr></thead><tbody>${rows.map(r=>`<tr><td>${esc(r.Block)}</td><td>${esc(r.Floor)}</td><td>${esc(r.Room)}</td><td>${esc(r.Bed)}</td><td>${esc(r.AdmissionNo)}</td><td>${esc(r.StudentName)}</td><td>${esc(r.Phone)}</td><td>${esc(r.FeeStatus)}</td><td>${esc(hist?r.DateTime:r.Status)}</td></tr>`).join("")}</tbody></table>`}
-function makeSimpleTable(rows,h){return `<table><thead><tr>${h.map(x=>`<th>${x}</th>`).join("")}</tr></thead><tbody>${rows.map(r=>`<tr>${h.map(x=>`<td>${esc(r[x])}</td>`).join("")}</tr>`).join("")}</tbody></table>`}
-function showTab(t){layoutView.style.display=t==="layout"?"block":"none";listView.style.display=t==="list"?"block":"none";usersView.style.display=t==="users"?"block":"none";historyView.style.display=t==="history"?"block":"none";["Layout","List","Users","History"].forEach(x=>document.getElementById("tab"+x).classList.remove("active"));document.getElementById("tab"+(t==="layout"?"Layout":t==="list"?"List":t==="users"?"Users":"History")).classList.add("active")}
-function toCSV(rows,h){return [h,...rows.map(r=>h.map(x=>r[x]??""))].map(row=>row.map(v=>`"${String(v).replaceAll('"','""')}"`).join(",")).join("\n")}
-function downloadCSV(s){download(s+".csv",toCSV(db[s],HEADERS[s]),"text/csv")}
-function downloadJSON(){download("hostel_backup.json",JSON.stringify(db,null,2),"application/json")}
-function download(n,c,t){const b=new Blob([c],{type:t}),u=URL.createObjectURL(b),a=document.createElement("a");a.href=u;a.download=n;a.click();URL.revokeObjectURL(u)}
+function deleteSelectedBlock(){ const b=adminBlock.value; if(!b) return alert("Select block"); deleteBlock(b); }
 
-loginPassword.addEventListener("keydown",e=>{if(e.key==="Enter")login()});
-window.addEventListener("load",async()=>{const s=sessionStorage.getItem("hostelUser");if(s){currentUser=JSON.parse(s);loginPage.style.display="none";app.style.display="block";loggedUser.textContent=currentUser.Name+" ("+currentUser.Role+")";const a=isAdmin();adminPanel.style.display=a?"flex":"none";permissionPanel.style.display=a?"flex":"none";csvPanel.style.display=a?"flex":"none";await pullFromCloud();refreshAll()}});
+async function deleteBlock(b){
+  if(!isAdmin()) return alert("Only admin");
+  if(!confirm(`Delete ${b} with all data?`)) return;
+  hostelLayout = hostelLayout.filter(x=>x.block!==b);
+  Object.keys(bedData).forEach(id=>{ if(id.startsWith(b+"__")) delete bedData[id]; });
+  wardens.forEach(w=>w.allowedBlocks=w.allowedBlocks.filter(x=>x!==b));
+  refreshAll();
+  showLoading("Saving...");
+  try { await apiPost("saveLayout",{layout:hostelLayout,updatedBy:currentUser.username}); } catch(e){ alert("Save failed: "+e.message); }
+  await syncAndRender("Refreshing...");
+}
+
+async function addFloor(){
+  if(!isAdmin()) return alert("Only admin");
+  const b=adminBlock.value, f=clean(newFloor.value);
+  const block=hostelLayout.find(x=>x.block===b);
+  if(!block||!f) return alert("Select block and enter floor");
+  if(block.floors.some(x=>x.floor.toLowerCase()===f.toLowerCase())) return alert("Floor exists");
+  block.floors.push({floor:f, rooms:[]}); newFloor.value=""; refreshAll();
+  showLoading("Saving...");
+  try { await apiPost("saveLayout",{layout:hostelLayout,updatedBy:currentUser.username}); } catch(e){ alert("Save failed: "+e.message); }
+  await syncAndRender("Refreshing...");
+}
+
+async function deleteSelectedFloor(){
+  if(!isAdmin()) return alert("Only admin");
+  const b=adminBlock.value, f=adminFloor.value;
+  if(!b||!f) return alert("Select block and floor");
+  if(!confirm(`Delete ${f} with all rooms and data?`)) return;
+  const block=hostelLayout.find(x=>x.block===b);
+  block.floors=block.floors.filter(x=>x.floor!==f);
+  Object.keys(bedData).forEach(id=>{ if(id.startsWith(b+"__"+f+"__")) delete bedData[id]; });
+  refreshAll();
+  showLoading("Saving...");
+  try { await apiPost("saveLayout",{layout:hostelLayout,updatedBy:currentUser.username}); } catch(e){ alert("Save failed: "+e.message); }
+  await syncAndRender("Refreshing...");
+}
+
+async function addRoom(){
+  if(!isAdmin()) return alert("Only admin");
+  const b=adminBlock.value, f=adminFloor.value, r=clean(newRoom.value), beds=parseInt(newBeds.value);
+  const floor=getFloor(b,f);
+  if(!floor||!r||!beds) return alert("Select floor, enter room and beds");
+  if(floor.rooms.some(x=>x.room.toLowerCase()===r.toLowerCase())) return alert("Room exists");
+  floor.rooms.push({room:r, beds}); newRoom.value=""; refreshAll();
+  showLoading("Saving...");
+  try { await apiPost("saveLayout",{layout:hostelLayout,updatedBy:currentUser.username}); } catch(e){ alert("Save failed: "+e.message); }
+  await syncAndRender("Refreshing...");
+}
+
+function deleteSelectedRoom(){ deleteRoom(adminBlock.value, adminFloor.value, adminRoom.value); }
+
+async function deleteRoom(b,f,r){
+  if(!isAdmin()) return alert("Only admin");
+  if(!b||!f||!r) return alert("Select room");
+  if(!confirm(`Delete room ${r} and its data?`)) return;
+  const floor=getFloor(b,f);
+  floor.rooms=floor.rooms.filter(x=>x.room!==r);
+  Object.keys(bedData).forEach(id=>{ if(id.startsWith(b+"__"+f+"__"+r+"__")) delete bedData[id]; });
+  refreshAll();
+  showLoading("Saving...");
+  try { await apiPost("saveLayout",{layout:hostelLayout,updatedBy:currentUser.username}); } catch(e){ alert("Save failed: "+e.message); }
+  await syncAndRender("Refreshing...");
+}
+
+async function addOneBed(){
+  if(!isAdmin()) return alert("Only admin");
+  const room=getRoom(adminBlock.value, adminFloor.value, adminRoom.value);
+  if(!room) return alert("Select room"); room.beds++; refreshAll();
+  showLoading("Saving...");
+  try { await apiPost("saveLayout",{layout:hostelLayout,updatedBy:currentUser.username}); } catch(e){ alert("Save failed: "+e.message); }
+  await syncAndRender("Refreshing...");
+}
+
+async function addBedFromRoom(b,f,r){
+  if(!isAdmin()) return alert("Only admin");
+  const room=getRoom(b,f,r); room.beds++; refreshAll();
+  showLoading("Saving...");
+  try { await apiPost("saveLayout",{layout:hostelLayout,updatedBy:currentUser.username}); } catch(e){ alert("Save failed: "+e.message); }
+  await syncAndRender("Refreshing...");
+}
+
+function getFloor(b,f){ const block=hostelLayout.find(x=>x.block===b); return block?block.floors.find(x=>x.floor===f):null; }
+function getRoom(b,f,r){ const floor=getFloor(b,f); return floor?floor.rooms.find(x=>x.room===r):null; }
+
+// ── Warden management ─────────────────────────────────────────
+async function saveWarden(){
+  if(!isAdmin()) return alert("Only admin");
+  const name=wardenName.value.trim(), username=wardenUsername.value.trim(), password=wardenPassword.value.trim();
+  const blocks=[...document.querySelectorAll(".blockCheck:checked")].map(x=>x.value);
+  if(!name||!username||!password) return alert("Enter name, username and password.");
+  if(username==="admin") return alert("Username admin is reserved.");
+  if(blocks.length===0) return alert("Select at least one block.");
+  const existing=wardens.find(w=>w.username===username);
+  if(existing){ existing.name=name; existing.password=password; existing.allowedBlocks=blocks; }
+  else wardens.push({username,password,name,role:"warden",allowedBlocks:blocks});
+  refreshPermissionPanel(); clearWardenForm();
+  showLoading("Saving warden...");
+  try { await apiPost("saveWardens",{wardens,updatedBy:currentUser.username}); } catch(e){ alert("Save failed: "+e.message); }
+  await syncAndRender("Refreshing...");
+  alert("Warden permission saved.");
+}
+
+function loadWardenForEdit(){
+  const username=wardenSelect.value; const w=wardens.find(x=>x.username===username); if(!w) return;
+  wardenName.value=w.name; wardenUsername.value=w.username; wardenPassword.value=w.password;
+  document.querySelectorAll(".blockCheck").forEach(c=>c.checked=w.allowedBlocks.includes(c.value));
+}
+
+async function deleteWarden(){
+  if(!isAdmin()) return;
+  const username=wardenSelect.value; if(!username) return alert("Select warden.");
+  if(!confirm("Delete warden login: "+username+"?")) return;
+  wardens=wardens.filter(w=>w.username!==username);
+  refreshPermissionPanel(); clearWardenForm();
+  showLoading("Saving...");
+  try { await apiPost("saveWardens",{wardens,updatedBy:currentUser.username}); } catch(e){ alert("Save failed: "+e.message); }
+  await syncAndRender("Refreshing...");
+}
+
+function clearWardenForm(){ wardenName.value=""; wardenUsername.value=""; wardenPassword.value=""; document.querySelectorAll(".blockCheck").forEach(c=>c.checked=false); }
+
+function refreshPermissionPanel(){
+  if(!isAdmin()) return;
+  blockChecks.innerHTML = hostelLayout.map(b=>`<label><input type="checkbox" class="blockCheck" value="${esc(b.block)}"> ${esc(b.block)}</label>`).join("");
+  wardenSelect.innerHTML='<option value="">Select warden</option>';
+  wardens.forEach(w=>wardenSelect.add(new Option(`${w.name} (${w.username})`,w.username)));
+  wardenList.innerHTML = wardens.length
+    ? `<table><thead><tr><th>Name</th><th>Username</th><th>Allowed Blocks</th></tr></thead><tbody>${wardens.map(w=>`<tr><td>${esc(w.name)}</td><td>${esc(w.username)}</td><td>${esc(w.allowedBlocks.join(", "))}</td></tr>`).join("")}</tbody></table>`
+    : "<p>No wardens added.</p>";
+}
+
+// ── Filters ───────────────────────────────────────────────────
+function refreshFilters(){
+  blockFilter.innerHTML='<option value="">All Blocks</option>';
+  floorFilter.innerHTML='<option value="">All Floors</option>';
+  const fs=new Set();
+  accessibleLayout().forEach(b=>{ blockFilter.add(new Option(b.block,b.block)); b.floors.forEach(f=>fs.add(f.floor)); });
+  [...fs].forEach(f=>floorFilter.add(new Option(f,f)));
+}
+
+function refreshAdminSelectors(){
+  if(!isAdmin()) return;
+  const ob=adminBlock.value, of=adminFloor.value, or_=adminRoom.value;
+  adminBlock.innerHTML="";
+  hostelLayout.forEach(b=>adminBlock.add(new Option(b.block,b.block)));
+  if(ob && hostelLayout.some(b=>b.block===ob)) adminBlock.value=ob;
+  adminFloor.innerHTML="";
+  const b=hostelLayout.find(x=>x.block===adminBlock.value);
+  if(b){ b.floors.forEach(f=>adminFloor.add(new Option(f.floor,f.floor))); if(of&&b.floors.some(f=>f.floor===of)) adminFloor.value=of; }
+  adminRoom.innerHTML="";
+  const f=b?b.floors.find(x=>x.floor===adminFloor.value):null;
+  if(f){ f.rooms.forEach(r=>adminRoom.add(new Option(`${r.room} (${r.beds} beds)`,r.room))); if(or_&&f.rooms.some(r=>r.room===or_)) adminRoom.value=or_; }
+}
+
+function refreshAll(){ refreshFilters(); refreshAdminSelectors(); refreshPermissionPanel(); render(); }
+
+// ── List / History ────────────────────────────────────────────
+function showList(){
+  const rows=[];
+  Object.keys(bedData).forEach(id=>{ const info=bedData[id], p=splitId(id); if(canAccessBlock(p.block)&&info.status&&info.status!=="vacant") rows.push({...p,...info}); });
+  studentList.innerHTML = rows.length ? makeTable(rows,false) : "<p>No occupied/reserved beds.</p>";
+}
+
+function showHistory(){
+  const rows=checkoutHistory.filter(h=>canAccessBlock(h.block));
+  historyList.innerHTML = rows.length ? makeTable(rows,true) : "<p>No checkout history.</p>";
+}
+
+function makeTable(rows,isHist){
+  return `<table><thead><tr><th>Block</th><th>Floor</th><th>Room</th><th>Bed</th><th>Admission</th><th>Name</th><th>Phone</th><th>Fee</th>${isHist?'<th>Checkout</th>':'<th>Status</th>'}</tr></thead><tbody>${rows.map(r=>`<tr><td>${esc(r.block)}</td><td>${esc(r.floor)}</td><td>${esc(r.room)}</td><td>${esc(r.bed)}</td><td>${esc(r.admissionNo||"")}</td><td>${esc(r.studentName||"")}</td><td>${esc(r.phone||"")}</td><td>${esc(r.feeStatus||"")}</td><td>${esc(isHist?r.checkoutDate:r.status)}</td></tr>`).join("")}</tbody></table>`;
+}
+
+function showTab(t){
+  layoutView.style.display  = t==="layout"  ? "block":"none";
+  listView.style.display    = t==="list"    ? "block":"none";
+  historyView.style.display = t==="history" ? "block":"none";
+  ["Layout","List","History"].forEach(x=>document.getElementById("tab"+x).classList.remove("active"));
+  document.getElementById("tab"+(t==="layout"?"Layout":t==="list"?"List":"History")).classList.add("active");
+}
+
+// ── Backup / Restore / CSV ─────────────────────────────────────
+function exportCSV(){
+  const rows=[["Block","Floor","Room","Bed","Status","Admission","Name","Phone","Guardian","ID Type","ID No","Fee Status","Monthly Fee","Join Date","Notes"]];
+  Object.keys(bedData).forEach(id=>{ const i=bedData[id],p=splitId(id); if(canAccessBlock(p.block)&&i.status&&i.status!=="vacant") rows.push([p.block,p.floor,p.room,p.bed,i.status,i.admissionNo||"",i.studentName||"",i.phone||"",i.guardian||"",i.idType||"",i.idNo||"",i.feeStatus||"",i.monthlyFee||"",i.joinDate||"",i.notes||""]); });
+  download("hostel_data.csv", rows.map(r=>r.map(v=>`"${String(v).replaceAll('"','""')}"`).join(",")).join("\n"), "text/csv");
+}
+
+function downloadBackup(){
+  download("hostel_backup.json", JSON.stringify({layout:hostelLayout,data:bedData,history:checkoutHistory,wardens},null,2), "application/json");
+}
+
+function restoreBackup(e){
+  if(!isAdmin()) return alert("Only admin can restore backup.");
+  const file=e.target.files[0]; if(!file) return;
+  const reader=new FileReader();
+  reader.onload=async ()=>{
+    try {
+      const b=JSON.parse(reader.result);
+      if(!b.layout||!b.data) throw Error();
+      if(!confirm("Restore backup? Current data will be replaced.")) return;
+      hostelLayout=b.layout; bedData=b.data; checkoutHistory=b.history||[]; wardens=b.wardens||[];
+      refreshAll();
+      showLoading("Restoring to Sheets...");
+      await apiPost("restoreBackup",{layout:b.layout, bedData:b.data, history:b.history||[], wardens:b.wardens||[], updatedBy:currentUser.username});
+      await syncAndRender("Refreshing...");
+    } catch(err){ hideLoading(); alert("Invalid backup file or save failed: "+err.message); }
+  };
+  reader.readAsText(file);
+}
+
+function download(name,content,type){ const blob=new Blob([content],{type}); const url=URL.createObjectURL(blob); const a=document.createElement("a"); a.href=url; a.download=name; a.click(); URL.revokeObjectURL(url); }
+function esc(s){ return String(s??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m])); }
+
+loginPassword.addEventListener("keydown", e=>{ if(e.key==="Enter") login(); });
+init();
 </script>
 </body>
 </html>
