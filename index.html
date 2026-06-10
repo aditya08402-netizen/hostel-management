@@ -1,777 +1,1778 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>Hostel Room Allotment with Warden Permissions</title>
-<style>
-*{box-sizing:border-box}body{margin:0;font-family:Arial,sans-serif;background:#f3f6f9;color:#1f2937}
-.login-page{min-height:100vh;display:flex;justify-content:center;align-items:center;padding:20px;background:linear-gradient(135deg,#1e3a8a,#2563eb)}
-.login-box{background:white;width:100%;max-width:400px;padding:28px;border-radius:18px;box-shadow:0 12px 35px rgba(0,0,0,.25)}
-.login-box h1{margin:0 0 8px;color:#1e3a8a;text-align:center}.login-box p{text-align:center;color:#6b7280}
-#error{display:none;background:#fee2e2;color:#991b1b;padding:10px;border-radius:8px;margin-bottom:12px;font-weight:bold;text-align:center}
-#app{display:none}header{background:#1e3a8a;color:white;padding:16px 22px;display:flex;justify-content:space-between;gap:10px;align-items:center;flex-wrap:wrap}
-header h1{margin:0;font-size:21px}.top{display:flex;gap:8px;flex-wrap:wrap;align-items:center}.badge{background:rgba(255,255,255,.15);padding:8px 10px;border-radius:8px;font-size:13px}
-.container{padding:20px;max-width:1350px;margin:auto}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:14px;margin-bottom:18px}
-.card{background:white;padding:15px;border-radius:12px;box-shadow:0 2px 10px rgba(0,0,0,.08)}.card h3{margin:0 0 7px;font-size:14px;color:#6b7280}.num{font-size:25px;font-weight:bold}
-button,.btn{border:0;padding:10px 13px;border-radius:8px;cursor:pointer;font-weight:bold}.primary{background:#2563eb;color:white}.danger{background:#dc2626;color:white}.gray{background:#e5e7eb;color:#111827}.green{background:#16a34a;color:white}.white{background:white;color:#1e3a8a}.orange{background:#f97316;color:white}
-.panel,.controls{background:white;padding:14px;border-radius:12px;box-shadow:0 2px 10px rgba(0,0,0,.08);display:flex;flex-wrap:wrap;gap:10px;margin-bottom:18px;align-items:end}.panel{border-left:6px solid #16a34a}
-.panel h2{width:100%;margin:0;color:#166534}.hint{width:100%;font-size:13px;color:#6b7280}
-label{font-size:13px;font-weight:bold;color:#374151}.field{display:flex;flex-direction:column;gap:5px;margin-bottom:8px}
-input,select,textarea{padding:10px;border:1px solid #d1d5db;border-radius:8px;font-size:14px;width:100%}.panel input,.panel select,.controls input,.controls select{width:210px}
-.block-title{margin:26px 0 12px;background:#dbeafe;padding:12px;border-radius:10px;border-left:7px solid #1e3a8a;display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}.block-title h2{margin:0}
-.floor-title{margin:18px 0 12px;border-left:6px solid #2563eb;padding-left:10px}.rooms{display:grid;grid-template-columns:repeat(auto-fit,minmax(285px,1fr));gap:16px}.room{background:white;border-radius:14px;padding:14px;box-shadow:0 2px 10px rgba(0,0,0,.08)}
-.room-head{display:flex;justify-content:space-between;gap:8px;margin-bottom:12px}.room-head h3{margin:0}.mini{padding:6px 8px;font-size:12px}.actions{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
-.beds{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}.bed{min-height:80px;border:0;border-radius:12px;color:white;cursor:pointer;padding:10px;text-align:left;font-weight:bold;box-shadow:inset 0 -3px 0 rgba(0,0,0,.12)}
-.vacant{background:#16a34a}.occupied{background:#dc2626}.reserved{background:#f97316}.bed small{display:block;font-weight:normal;margin-top:5px;opacity:.95}
-.legend{display:flex;gap:16px;margin:10px 0 18px;font-weight:bold;flex-wrap:wrap}.dot{width:18px;height:18px;border-radius:50%;display:inline-block;margin-right:6px;vertical-align:middle}.dg{background:#16a34a}.dr{background:#dc2626}.do{background:#f97316}
-.modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);justify-content:center;align-items:center;padding:18px;z-index:50}.modal-content{background:white;width:100%;max-width:720px;border-radius:14px;padding:20px;max-height:92vh;overflow:auto}.modal-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}.modal-head h2{margin:0}.close{font-size:26px;cursor:pointer;font-weight:bold}.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.full{grid-column:1/-1}.modal-actions{display:flex;gap:10px;justify-content:flex-end;margin-top:16px;flex-wrap:wrap}
-table{width:100%;border-collapse:collapse;background:white;border-radius:12px;overflow:hidden;box-shadow:0 2px 10px rgba(0,0,0,.08)}th,td{padding:10px;border-bottom:1px solid #e5e7eb;text-align:left;font-size:14px}th{background:#1e3a8a;color:white}
-.tabs{display:flex;gap:8px;margin:10px 0 15px;flex-wrap:wrap}.tab{background:#e5e7eb}.tab.active{background:#2563eb;color:white}
-.checks{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:6px;width:420px;max-width:100%;background:#f9fafb;padding:8px;border-radius:8px;border:1px solid #e5e7eb}.checks label{font-weight:normal}
-#loadingOverlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:100;justify-content:center;align-items:center;flex-direction:column;gap:14px}
-.spinner{width:48px;height:48px;border:5px solid rgba(255,255,255,.3);border-top-color:white;border-radius:50%;animation:spin .8s linear infinite}
-@keyframes spin{to{transform:rotate(360deg)}}
-#loadingMsg{color:white;font-size:16px;font-weight:bold}
-@media(max-width:700px){.form-grid{grid-template-columns:1fr}.panel input,.panel select,.controls input,.controls select{width:100%}.checks{width:100%}}
-@media print{header,.panel,.controls,.legend,.top,.tabs{display:none!important}body{background:white}.card,.room,table{box-shadow:none;border:1px solid #ddd}}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cloud Hostel Management Suite</title>
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1d4ed8;
+            --bg-main: #f8fafc;
+            --bg-card: #ffffff;
+            --text-dark: #1e293b;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+            --vacant: #22c55e;
+            --occupied: #ef4444;
+            --reserved: #f97316;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-main);
+            color: var(--text-dark);
+            line-height: 1.5;
+        }
+
+        /* Login Layout */
+        #login-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%);
+            padding: 20px;
+        }
+
+        .login-card {
+            background: var(--bg-card);
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+            width: 100%;
+            max-width: 400px;
+        }
+
+        .login-card h2 {
+            margin-bottom: 24px;
+            text-align: center;
+            color: #0f172a;
+        }
+
+        /* Application Main Layout */
+        #app-container {
+            display: none;
+            min-height: 100vh;
+            flex-direction: column;
+        }
+
+        header {
+            background-color: #0f172a;
+            color: #fff;
+            padding: 16px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .user-profile-zone {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        /* Navigation Tabs */
+        nav {
+            background-color: #1e293b;
+            display: flex;
+            overflow-x: auto;
+            white-space: nowrap;
+        }
+
+        nav button {
+            background: none;
+            border: none;
+            color: #94a3b8;
+            padding: 14px 20px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+
+        nav button:hover {
+            color: #fff;
+            background-color: #334155;
+        }
+
+        nav button.active {
+            color: #fff;
+            background-color: var(--primary);
+        }
+
+        /* App Main Content View */
+        main {
+            flex: 1;
+            padding: 24px;
+            max-width: 1600px;
+            width: 100%;
+            margin: 0 auto;
+        }
+
+        .view-panel {
+            display: none;
+        }
+
+        .view-panel.active {
+            display: block;
+        }
+
+        /* UI Blocks & Components */
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 24px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+
+        h2.panel-title {
+            margin-bottom: 20px;
+            font-size: 22px;
+            color: #0f172a;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        /* KPI Counter System */
+        .counters-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .counter-card {
+            background: var(--bg-card);
+            border-left: 5px solid var(--primary);
+            padding: 16px;
+            border-radius: 6px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            border-top: 1px solid var(--border);
+            border-right: 1px solid var(--border);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .counter-card.vacant { border-left-color: var(--vacant); }
+        .counter-card.occupied { border-left-color: var(--occupied); }
+        .counter-card.reserved { border-left-color: var(--reserved); }
+        .counter-card.pending { border-left-color: #eab308; }
+
+        .counter-label {
+            font-size: 12px;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            font-weight: 600;
+        }
+
+        .counter-value {
+            font-size: 28px;
+            font-weight: 700;
+            margin-top: 4px;
+        }
+
+        /* Form Controls */
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 14px;
+            font-weight: 500;
+            margin-bottom: 6px;
+            color: #334155;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            font-size: 14px;
+            background-color: #fff;
+            color: var(--text-dark);
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(37,99,235,0.15);
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        .grid-3 {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 16px;
+        }
+
+        /* Buttons styling */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 10px 18px;
+            font-size: 14px;
+            font-weight: 500;
+            border-radius: 6px;
+            border: 1px solid transparent;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-decoration: none;
+            gap: 8px;
+        }
+
+        .btn-primary { background: var(--primary); color: white; }
+        .btn-primary:hover { background: var(--primary-dark); }
+        .btn-secondary { background: #64748b; color: white; }
+        .btn-secondary:hover { background: #475569; }
+        .btn-danger { background: var(--occupied); color: white; }
+        .btn-danger:hover { background: #dc2626; }
+        .btn-success { background: var(--vacant); color: white; }
+        .btn-success:hover { background: #16a34a; }
+
+        /* Tables & Responsive Overlays */
+        .table-container {
+            width: 100%;
+            overflow-x: auto;
+            margin-top: 12px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+            font-size: 14px;
+        }
+
+        th {
+            background-color: #f1f5f9;
+            color: #475569;
+            font-weight: 600;
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        td {
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--border);
+            color: var(--text-dark);
+        }
+
+        tr:last-child td { border-bottom: none; }
+        tr:hover td { background-color: #f8fafc; }
+
+        /* Room Visualizer Layout Elements */
+        .room-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+            margin-top: 16px;
+        }
+
+        .room-card {
+            background: #fff;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 16px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+        }
+
+        .room-header {
+            font-weight: 700;
+            font-size: 16px;
+            margin-bottom: 12px;
+            border-bottom: 2px solid #f1f5f9;
+            padding-bottom: 6px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .beds-container {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+        }
+
+        .bed-unit {
+            padding: 10px;
+            border-radius: 6px;
+            text-align: center;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            color: white;
+            transition: transform 0.2s;
+            word-break: break-all;
+        }
+
+        .bed-unit:hover {
+            transform: scale(1.03);
+        }
+
+        .bed-unit.vacant { background-color: var(--vacant); }
+        .bed-unit.occupied { background-color: var(--occupied); }
+        .bed-unit.reserved { background-color: var(--reserved); }
+
+        /* Modal Subsystem */
+        .modal {
+            display: none;
+            position: fixed;
+            top:0; left:0; width:100%; height:100%;
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(4px);
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+            padding: 16px;
+        }
+
+        .modal.active { display: flex; }
+        
+        .modal-content {
+            background: white;
+            padding: 24px;
+            border-radius: 8px;
+            width: 100%;
+            max-width: 550px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1);
+        }
+
+        .modal-header {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .close-modal {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: var(--text-muted);
+        }
+
+        /* Filter Row Container */
+        .filter-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 20px;
+            background: #f1f5f9;
+            padding: 16px;
+            border-radius: 6px;
+        }
+
+        .filter-row .form-group {
+            margin-bottom: 0;
+            flex: 1;
+            min-width: 180px;
+        }
+
+        /* General Loading Overlay */
+        #global-loader {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(255,255,255,0.8);
+            z-index: 9999;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            font-weight: 600;
+            font-size: 18px;
+        }
+
+        .spinner {
+            border: 4px solid rgba(0,0,0,0.1);
+            width: 46px;
+            height: 46px;
+            border-radius: 50%;
+            border-left-color: var(--primary);
+            animation: spin 1s linear infinite;
+            margin-bottom: 12px;
+        }
+
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        /* Badge elements */
+        .badge {
+            display: inline-block;
+            padding: 3px 8px;
+            font-size: 11px;
+            font-weight: 600;
+            border-radius: 12px;
+            color: white;
+        }
+        .badge.vacant { background: var(--vacant); }
+        .badge.occupied { background: var(--occupied); }
+        .badge.reserved { background: var(--reserved); }
+        .badge.paid { background: var(--vacant); }
+        .badge.pending { background: #eab308; }
+
+        @media(max-width: 768px) {
+            .grid-2 { grid-template-columns: 1fr; }
+            header { flex-direction: column; align-items: flex-start; }
+            .user-profile-zone { width: 100%; justify-content: space-between; }
+        }
+    </style>
 </head>
 <body>
 
-<!-- Loading Overlay -->
-<div id="loadingOverlay" style="display:flex">
-  <div class="spinner"></div>
-  <div id="loadingMsg">Connecting to Google Sheets...</div>
-</div>
+    <div id="global-loader">
+        <div class="spinner"></div>
+        <div id="loader-text">Initializing Application...</div>
+    </div>
 
-<div class="login-page" id="loginPage" style="display:none">
- <div class="login-box">
-  <h1>Hostel Login</h1><p>Room Allotment with Block Permissions</p><div id="error">Invalid username or password</div>
-  <div class="field"><label>Username</label><input id="loginUsername" placeholder="admin"></div>
-  <div class="field"><label>Password</label><input id="loginPassword" type="password" placeholder="1234"></div>
-  <button class="primary" style="width:100%" onclick="login()">Login</button>
-  <p style="font-size:12px;color:#6b7280;text-align:center">Contact admin for credentials</p>
- </div>
-</div>
+    <div id="login-container">
+        <div class="login-card">
+            <h2>Hostel Portal Login</h2>
+            <form id="login-form" onsubmit="executeLogin(event)">
+                <div class="form-group">
+                    <label>Username</label>
+                    <input type="text" id="login-username" class="form-control" required autocomplete="username">
+                </div>
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="password" id="login-password" class="form-control" required autocomplete="current-password">
+                </div>
+                <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 10px;">Sign In</button>
+            </form>
+        </div>
+    </div>
 
-<div id="app">
-<header>
- <h1>Hostel Room Allotment</h1>
- <div class="top">
-  <span class="badge" id="loggedUser"></span>
-  <button class="gray" onclick="downloadBackup()">Backup</button>
-  <button class="gray" onclick="document.getElementById('restoreFile').click()">Restore</button>
-  <input type="file" id="restoreFile" accept=".json" style="display:none" onchange="restoreBackup(event)">
-  <button class="gray" onclick="exportCSV()">CSV</button>
-  <button class="white" onclick="window.print()">Print</button>
-  <button class="white" onclick="logout()">Logout</button>
- </div>
-</header>
+    <div id="app-container">
+        <header>
+            <h1 style="font-size: 20px;">Hostel Management Suite</h1>
+            <div class="user-profile-zone">
+                <div>Welcome, <span id="user-display-name" style="font-weight:600; color:#38bdf8;">User</span> (<span id="user-display-role" style="font-style:italic;">Role</span>)</div>
+                <button class="btn btn-danger" style="padding: 6px 12px; font-size: 12px;" onclick="executeLogout()">Sign Out</button>
+            </div>
+        </header>
 
-<div class="container">
- <div class="grid">
-  <div class="card"><h3>Total Beds</h3><div class="num" id="totalBeds">0</div></div>
-  <div class="card"><h3>Occupied</h3><div class="num" id="occupiedBeds">0</div></div>
-  <div class="card"><h3>Vacant</h3><div class="num" id="vacantBeds">0</div></div>
-  <div class="card"><h3>Reserved</h3><div class="num" id="reservedBeds">0</div></div>
-  <div class="card"><h3>Fee Pending</h3><div class="num" id="feePending">0</div></div>
- </div>
+        <nav id="navbar">
+            <button class="nav-link active" onclick="switchTab('dashboard')">Dashboard / Layout</button>
+            <button class="nav-link" onclick="switchTab('occupants')">Occupants Roster</button>
+            <button class="nav-link admin-only principal-only" onclick="switchTab('layout-mgmt')">Room Configuration</button>
+            <button class="nav-link admin-only" onclick="switchTab('user-mgmt')">User Management</button>
+            <button class="nav-link" onclick="switchTab('history')">Checkout History</button>
+            <button class="nav-link" onclick="switchTab('io-center')">Data Import/Export</button>
+        </nav>
 
- <div class="panel" id="adminPanel" style="display:none">
-  <h2>Admin Layout Controls</h2><div class="hint">Admin can add/delete blocks, floors, rooms and beds.</div>
-  <div class="field"><label>Add Block</label><input id="newBlock" placeholder="A Block"></div><button class="green" onclick="addBlock()">Add Block</button>
-  <div class="field"><label>Select Block</label><select id="adminBlock" onchange="refreshAdminSelectors()"></select></div><button class="danger" onclick="deleteSelectedBlock()">Delete Block</button>
-  <div class="field"><label>Add Floor</label><input id="newFloor" placeholder="Ground Floor"></div><button class="green" onclick="addFloor()">Add Floor</button>
-  <div class="field"><label>Select Floor</label><select id="adminFloor" onchange="refreshAdminSelectors()"></select></div><button class="danger" onclick="deleteSelectedFloor()">Delete Floor</button>
-  <div class="field"><label>Room No.</label><input id="newRoom" placeholder="101"></div>
-  <div class="field"><label>Beds</label><input id="newBeds" type="number" min="1" value="4"></div><button class="green" onclick="addRoom()">Add Room</button>
-  <div class="field"><label>Select Room</label><select id="adminRoom"></select></div><button class="primary" onclick="addOneBed()">Add 1 Bed</button><button class="danger" onclick="deleteSelectedRoom()">Delete Room</button>
- </div>
+        <main>
+            <div id="view-dashboard" class="view-panel active">
+                <div class="counters-grid">
+                    <div class="counter-card">
+                        <div class="counter-label">Total Structural Beds</div>
+                        <div class="counter-value" id="count-total">0</div>
+                    </div>
+                    <div class="counter-card vacant">
+                        <div class="counter-label">Vacant Available</div>
+                        <div class="counter-value" id="count-vacant">0</div>
+                    </div>
+                    <div class="counter-card occupied">
+                        <div class="counter-label">Occupied Rooms</div>
+                        <div class="counter-value" id="count-occupied">0</div>
+                    </div>
+                    <div class="counter-card reserved">
+                        <div class="counter-label">Reserved Settings</div>
+                        <div class="counter-value" id="count-reserved">0</div>
+                    </div>
+                    <div class="counter-card pending">
+                        <div class="counter-label">Fee Arrears Pending</div>
+                        <div class="counter-value" id="count-pending">0</div>
+                    </div>
+                </div>
 
- <div class="panel" id="permissionPanel" style="display:none;border-left-color:#f97316">
-  <h2>Warden Permission Controls</h2>
-  <div class="hint">Create wardens and assign which blocks they can access. Wardens cannot see other blocks.</div>
-  <div class="field"><label>Warden Name</label><input id="wardenName" placeholder="Example: Warden 1"></div>
-  <div class="field"><label>Username</label><input id="wardenUsername" placeholder="warden1"></div>
-  <div class="field"><label>Password</label><input id="wardenPassword" placeholder="1234"></div>
-  <div class="field full"><label>Allowed Blocks</label><div id="blockChecks" class="checks"></div></div>
-  <button class="green" onclick="saveWarden()">Save / Update Warden</button>
-  <div class="field"><label>Edit Existing Warden</label><select id="wardenSelect" onchange="loadWardenForEdit()"></select></div>
-  <button class="danger" onclick="deleteWarden()">Delete Warden</button>
-  <div id="wardenList" class="full"></div>
- </div>
+                <div class="card">
+                    <h2 class="panel-title">Interactive Structural Matrix Finder</h2>
+                    <div class="filter-row">
+                        <div class="form-group">
+                            <label>Search Text (Name, Adm No, Phone)</label>
+                            <input type="text" id="dash-search" class="form-control" placeholder="Search..." oninput="renderDashboardLayout()">
+                        </div>
+                        <div class="form-group">
+                            <label>Block Filter</label>
+                            <select id="dash-filter-block" class="form-control" onchange="renderDashboardLayout()"></select>
+                        </div>
+                        <div class="form-group">
+                            <label>Floor Filter</label>
+                            <select id="dash-filter-floor" class="form-control" onchange="renderDashboardLayout()">
+                                <option value="All">All Floors</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Bed State</label>
+                            <select id="dash-filter-status" class="form-control" onchange="renderDashboardLayout()">
+                                <option value="All">All States</option>
+                                <option value="Vacant">Vacant</option>
+                                <option value="Occupied">Occupied</option>
+                                <option value="Reserved">Reserved</option>
+                            </select>
+                        </div>
+                    </div>
 
- <div class="controls">
-  <input id="search" placeholder="Search name / admission / phone / ID" oninput="render()">
-  <select id="blockFilter" onchange="render()"><option value="">All Blocks</option></select>
-  <select id="floorFilter" onchange="render()"><option value="">All Floors</option></select>
-  <select id="statusFilter" onchange="render()"><option value="">All Status</option><option value="vacant">Vacant</option><option value="occupied">Occupied</option><option value="reserved">Reserved</option></select>
-  <select id="feeFilter" onchange="render()"><option value="">All Fee Status</option><option value="Paid">Paid</option><option value="Pending">Pending</option><option value="Partial">Partial</option></select>
- </div>
+                    <div id="interactive-room-grid" class="room-grid"></div>
+                </div>
+            </div>
 
- <div class="legend"><span><span class="dot dg"></span>Vacant</span><span><span class="dot dr"></span>Occupied</span><span><span class="dot do"></span>Reserved</span></div>
+            <div id="view-occupants" class="view-panel">
+                <div class="card">
+                    <h2 class="panel-title">
+                        Active Allotted Occupants Registry
+                        <button class="btn btn-secondary" onclick="exportToCSV('Beds')">Export CSV Report</button>
+                    </h2>
+                    <div class="filter-row">
+                        <div class="form-group" style="flex:2;">
+                            <label>Live Registry Filter Lookup</label>
+                            <input type="text" id="roster-search" class="form-control" placeholder="Type here to search..." oninput="renderOccupantsTable()">
+                        </div>
+                        <div class="form-group">
+                            <label>Fee Filter Status</label>
+                            <select id="roster-filter-fee" class="form-control" onchange="renderOccupantsTable()">
+                                <option value="All">All Statuses</option>
+                                <option value="Paid">Paid Only</option>
+                                <option value="Pending">Pending Overdue</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Admission No</th>
+                                    <th>Student Name</th>
+                                    <th>Course Matrix</th>
+                                    <th>Block</th>
+                                    <th>Floor</th>
+                                    <th>Room</th>
+                                    <th>Bed ID</th>
+                                    <th>Fee Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="occupants-table-body"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
 
- <div class="tabs">
-  <button class="tab active" id="tabLayout" onclick="showTab('layout')">Room Layout</button>
-  <button class="tab" id="tabList" onclick="showTab('list')">Occupant List</button>
-  <button class="tab" id="tabHistory" onclick="showTab('history')">Checkout History</button>
- </div>
+            <div id="view-layout-mgmt" class="view-panel admin-only principal-only">
+                <div class="grid-2">
+                    <div class="card">
+                        <h2 class="panel-title">Add Structural Unit Location</h2>
+                        <form id="layout-generation-form" onsubmit="addNewLayoutUnit(event)">
+                            <div class="form-group">
+                                <label>Block Name</label>
+                                <input type="text" id="lay-block" class="form-control" placeholder="e.g., Boys Hostel, Girls Hostel" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Floor Number/Identifier</label>
+                                <input type="text" id="lay-floor" class="form-control" placeholder="e.g., Ground Floor, 1st Floor" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Room Designation Number</label>
+                                <input type="text" id="lay-room" class="form-control" placeholder="e.g., 101, 202-A" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Total Number of Physical Beds Available</label>
+                                <input type="number" id="lay-beds" class="form-control" min="1" max="20" required>
+                            </div>
+                            <button type="submit" class="btn btn-primary" style="width:100%;">Generate Structural Layout & Commit</button>
+                        </form>
+                    </div>
 
- <div id="layoutView"><div id="layoutBox"></div></div>
- <div id="listView" style="display:none"><div id="studentList"></div></div>
- <div id="historyView" style="display:none"><div id="historyList"></div></div>
-</div>
-</div>
+                    <div class="card">
+                        <h2 class="panel-title">Current Layout Topologies Matrix</h2>
+                        <div class="table-container" style="max-height: 450px;">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Block</th>
+                                        <th>Floor</th>
+                                        <th>Room</th>
+                                        <th>Beds Count</th>
+                                        <th>Action Remove</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="layout-matrix-body"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
-<div class="modal" id="bedModal">
- <div class="modal-content">
-  <div class="modal-head"><h2 id="modalTitle">Bed Details</h2><span class="close" onclick="closeModal()">&times;</span></div>
-  <div class="form-grid">
-   <div class="field"><label>Status</label><select id="status"><option value="vacant">Vacant</option><option value="occupied">Occupied</option><option value="reserved">Reserved</option></select></div>
-   <div class="field"><label>Fee Status</label><select id="feeStatus"><option>Paid</option><option>Pending</option><option>Partial</option></select></div>
-   <div class="field"><label>Admission No.</label><input id="admissionNo"></div>
-   <div class="field"><label>Student Name</label><input id="studentName"></div>
-   <div class="field"><label>Phone</label><input id="phone"></div>
-   <div class="field"><label>Guardian</label><input id="guardian"></div>
-   <div class="field"><label>ID Proof Type</label><select id="idType"><option>Aadhaar</option><option>Voter ID</option><option>Passport</option><option>Other</option></select></div>
-   <div class="field"><label>ID Proof No.</label><input id="idNo"></div>
-   <div class="field"><label>Joining Date</label><input id="joinDate" type="date"></div>
-   <div class="field"><label>Monthly Fee</label><input id="monthlyFee" type="number" placeholder="Example: 6000"></div>
-   <div class="field full"><label>Transfer to another vacant allowed bed</label><select id="transferBed"><option value="">No transfer</option></select></div>
-   <div class="field full"><label>Address / Notes</label><textarea id="notes" rows="3"></textarea></div>
-  </div>
-  <div class="modal-actions">
-   <button class="orange" onclick="checkoutBed()">Checkout</button>
-   <button class="danger" onclick="makeVacant()">Make Vacant</button>
-   <button class="primary" onclick="saveBed()">Save</button>
-   <button class="gray" onclick="closeModal()">Close</button>
-  </div>
- </div>
-</div>
+            <div id="view-user-mgmt" class="view-panel admin-only">
+                <div class="grid-2">
+                    <div class="card">
+                        <h2 class="panel-title">Create / Update Sub-User Account</h2>
+                        <form id="user-creation-form" onsubmit="saveUserAccount(event)">
+                            <div class="form-group">
+                                <label>Account Login Username</label>
+                                <input type="text" id="usr-username" class="form-control" required autocomplete="username">
+                            </div>
+                            <div class="form-group">
+                                <label>Password Phrase</label>
+                                <input type="password" id="usr-password" class="form-control" required autocomplete="new-password">
+                            </div>
+                            <div class="form-group">
+                                <label>Full Name</label>
+                                <input type="text" id="usr-name" class="form-control" required>
+                            </div>
+                            <div class="form-group">
+                                <label>System Authorization Role Access Profile</label>
+                                <select id="usr-role" class="form-control">
+                                    <option value="Warden">Warden</option>
+                                    <option value="Principal">Principal</option>
+                                    <option value="Admin">Admin</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Allowed Blocks Mapping (Comma-separated or 'All')</label>
+                                <input type="text" id="usr-blocks" class="form-control" placeholder="e.g., Boys Hostel, Back Block" required>
+                            </div>
+                            <div class="form-group">
+                                <label>User Account Status Setting</label>
+                                <select id="usr-active" class="form-control">
+                                    <option value="TRUE">Active operational</option>
+                                    <option value="FALSE">Inactive suspended</option>
+                                </select>
+                            </div>
+                            <button type="submit" class="btn btn-primary" style="width:100%;">Commit System Account Profile</button>
+                        </form>
+                    </div>
 
-<script>
-// ============================================================
-// CONFIGURATION — paste your deployed Apps Script URL here
-// ============================================================
-const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxI7IGLesoHFsxtR1U7nqpY0f_qDabpCR68oEkFld98-MxiafNKGajAFAka9rYAdUlZow/exec";
-// ============================================================
+                    <div class="card">
+                        <h2 class="panel-title">Authorized System Accounts Map</h2>
+                        <div class="table-container">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Username</th>
+                                        <th>Name</th>
+                                        <th>Role</th>
+                                        <th>Scope Scope Allowed</th>
+                                        <th>Active State Status</th>
+                                        <th>Operation Control</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="user-matrix-body"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
-// ── In-memory state ──────────────────────────────────────────
-let currentUser = null;
-let selectedBedId = null;
-let hostelLayout = [];   // [{block, floors:[{floor, rooms:[{room,beds}]}]}]
-let bedData = {};        // { bedId: { status, studentName, ... } }
-let checkoutHistory = [];
-let wardens = [];
+            <div id="view-history" class="view-panel">
+                <div class="card">
+                    <h2 class="panel-title">
+                        Archival Permanent Checkout & Allocation History logs
+                        <button class="btn btn-secondary" onclick="exportToCSV('History')">Export CSV Records Log</button>
+                    </h2>
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Admission Reference</th>
+                                    <th>Student Name Full</th>
+                                    <th>Room Run</th>
+                                    <th>Bed Location Index ID</th>
+                                    <th>Check-in Settlement Date</th>
+                                    <th>Check-out Finalization Date</th>
+                                </tr>
+                            </thead>
+                            <tbody id="history-log-body"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
 
-// ── Loading overlay ──────────────────────────────────────────
-function showLoading(msg){ loadingOverlay.style.display="flex"; loadingMsg.textContent=msg||"Loading..."; }
-function hideLoading(){ loadingOverlay.style.display="none"; }
+            <div id="view-io-center" class="view-panel">
+                <div class="card">
+                    <h2 class="panel-title">System Wide Central Interoperability IO</h2>
+                    <p style="margin-bottom: 20px; font-size: 14px; color: var(--text-muted);">
+                        Export datasets downstream into clear text format structures, or mass overwrite internal configuration state parameters using file imports. CSV processing updates immediately locally prior to uploading to the master spreadsheet database engine.
+                    </p>
+                    
+                    <div class="grid-2">
+                        <div style="border: 1px solid var(--border); padding: 16px; border-radius: 6px;">
+                            <h3 style="margin-bottom:12px;">Active System Component Exporters</h3>
+                            <div style="display:flex; flex-direction:column; gap:10px;">
+                                <button class="btn btn-secondary" onclick="exportToCSV('Users')">Download Users Matrix Spreadsheet CSV</button>
+                                <button class="btn btn-secondary" onclick="exportToCSV('Layout')">Download Structural Core Layouts CSV</button>
+                                <button class="btn btn-secondary" onclick="exportToCSV('Beds')">Download Beds System Map Status Records CSV</button>
+                                <button class="btn btn-secondary" onclick="exportToCSV('History')">Download History Transactions Database Archive CSV</button>
+                            </div>
+                        </div>
 
-// ── Bootstrap ────────────────────────────────────────────────
-async function init(){
-  showLoading("Connecting to Google Sheets...");
-  try {
-    const data = await apiGet("getData");
-    applyServerData(data);
-    hideLoading();
-    const saved = sessionStorage.getItem("hostelSession");
-    if(saved){ const u = JSON.parse(saved); const fresh = allUsers().find(x=>x.username===u.username)||u; showApp(fresh); }
-    else { loginPage.style.display="flex"; }
-  } catch(e){
-    hideLoading();
-    alert("Could not connect to Google Sheets.\nCheck APPS_SCRIPT_URL.\n\n"+e.message);
-    loginPage.style.display="flex";
-  }
-}
+                        <div style="border: 1px solid var(--border); padding: 16px; border-radius: 6px;">
+                            <h3 style="margin-bottom:12px;">Active Pipeline Overwrite Importers</h3>
+                            <div class="form-group">
+                                <label>Target Stream Table Target Context</label>
+                                <select id="import-target-sheet" class="form-control">
+                                    <option value="Users">System User Registry Accounts Database</option>
+                                    <option value="Layout">Structural Layout Blueprint Specifications</option>
+                                    <option value="Beds">Master Bed Assignment Records Data Layout</option>
+                                    <option value="History">Archival Logging Database Logs</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Select CSV Source Flat File</label>
+                                <input type="file" id="import-file-input" class="form-control" accept=".csv">
+                            </div>
+                            <button class="btn btn-danger" style="width:100%;" onclick="triggerCSVImportProcess()">Process Upload & Destructively Overwrite Matrix</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
 
-function applyServerData(data){
-  hostelLayout = data.layout || [];
-  wardens = data.wardens || [];
-  // bedData: array of rows → keyed object
-  bedData = {};
-  (data.bedData || []).forEach(row => {
-    if(row.bedID) bedData[row.bedID] = {
-      status: row.status || "vacant",
-      admissionNo: row.admissionNo || "",
-      studentName: row.studentName || "",
-      phone: row.phone || "",
-      guardian: row.guardian || "",
-      idType: row.idType || "Aadhaar",
-      idNo: row.idNo || "",
-      joinDate: row.joinDate || "",
-      monthlyFee: row.monthlyFee || "",
-      feeStatus: row.feeStatus || "Paid",
-      notes: row.notes || "",
-      updatedAt: row.updatedAt || "",
-      updatedBy: row.updatedBy || ""
-    };
-  });
-  checkoutHistory = data.history || [];
-}
+    <div id="bed-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modal-bed-title">Bed Unit Registration Node</h3>
+                <button class="close-modal" onclick="closeBedSystemModal()">&times;</button>
+            </div>
+            
+            <div id="modal-view-section">
+                <div style="background:#f1f5f9; padding: 14px; border-radius: 6px; margin-bottom:16px;">
+                    <div>Current Allocation Metric Node State: <span id="modal-status-badge" class="badge vacant">Vacant</span></div>
+                </div>
+                <div id="modal-occupant-details" style="display:none; margin-bottom: 16px;">
+                    <table class="form-control" style="border:none; width:100%;">
+                        <tr><td><b>Adm Number:</b></td><td id="lbl-adm"></td></tr>
+                        <tr><td><b>Student:</b></td><td id="lbl-name"></td></tr>
+                        <tr><td><b>Course Program:</b></td><td id="lbl-course"></td></tr>
+                        <tr><td><b>Academic Year:</b></td><td id="lbl-year"></td></tr>
+                        <tr><td><b>Phone Contact:</b></td><td id="lbl-phone"></td></tr>
+                        <tr><td><b>Parent Phone:</b></td><td id="lbl-parent"></td></tr>
+                        <tr><td><b>Home Residency:</b></td><td id="lbl-address"></td></tr>
+                        <tr><td><b>Date Allocation:</b></td><td id="lbl-date"></td></tr>
+                        <tr><td><b>Financial Status:</b></td><td><span id="lbl-fee" class="badge"></span></td></tr>
+                    </table>
+                </div>
+                <div style="display:flex; gap:10px; margin-top:16px;">
+                    <button id="btn-trigger-allot" class="btn btn-primary" onclick="showAllotmentFormView()">Assign Student to Node</button>
+                    <button id="btn-trigger-checkout" class="btn btn-danger" style="display:none;" onclick="processBedCheckoutExecution()">Execute Active Checkout Record</button>
+                    <button id="btn-trigger-reserve" class="btn btn-secondary" onclick="toggleBedReservationState()">Toggle Hold/Reserve Status</button>
+                </div>
+            </div>
 
-// ── API helpers ───────────────────────────────────────────────
-async function apiGet(action, params={}){
-  const qs = new URLSearchParams({action, ...params}).toString();
-  const res = await fetch(`${APPS_SCRIPT_URL}?${qs}`);
-  const json = await res.json();
-  if(json.error) throw new Error(json.error);
-  return json;
-}
+            <div id="modal-allot-form-section" style="display:none;">
+                <form id="bed-allotment-execution-form" onsubmit="processBedAssignmentExecution(event)">
+                    <div class="form-group">
+                        <label>Student Admission Number ID Reference</label>
+                        <input type="text" id="alt-adm" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Student Full Name Text</label>
+                        <input type="text" id="alt-name" class="form-control" required>
+                    </div>
+                    <div class="grid-2">
+                        <div class="form-group">
+                            <label>Course Matriculation Track</label>
+                            <input type="text" id="alt-course" class="form-control" placeholder="B.Tech, Medical, Arts" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Current Study Term Year</label>
+                            <input type="text" id="alt-year" class="form-control" placeholder="1st Year, 3rd Year" required>
+                        </div>
+                    </div>
+                    <div class="grid-2">
+                        <div class="form-group">
+                            <label>Personal Mobile Line No</label>
+                            <input type="tel" id="alt-phone" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Parent / Guardian Contact Line</label>
+                            <input type="tel" id="alt-parent" class="form-control" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Residential Mailing Address Destination</label>
+                        <textarea id="alt-address" class="form-control" rows="2" required></textarea>
+                    </div>
+                    <div class="grid-2">
+                        <div class="form-group">
+                            <label>Check-In Intake Matrix Date</label>
+                            <input type="date" id="alt-date" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Accounting Fee Clearing Status Balance</label>
+                            <select id="alt-fee" class="form-control">
+                                <option value="Paid">Fully Paid Cleared</option>
+                                <option value="Pending">Pending Outstandings Balance</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div style="display:flex; gap:10px; margin-top:14px;">
+                        <button type="submit" class="btn btn-success" style="flex:1;">Confirm Allotment Allocation</button>
+                        <button type="button" class="btn btn-secondary" onclick="cancelFormAllotmentReturnView()">Cancel</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
 
-async function apiPost(action, payload={}){
-  const body = JSON.stringify({action, ...payload});
+    <script>
+        /******************************************************************
+         * APPLICATION GLOBAL RUNTIME CONFIGURATION CONFIG HOOK
+         ******************************************************************/
+        // PASTE YOUR GOOGLE APPS SCRIPT WEB APP EXTENSION URL HERE DEPLOYMENT LINK
+        const API_URL = 'https://script.google.com/macros/s/AKfycbzhNAwfHfDyZ0v9Vn8T497gz1pS_k-pVA0rb16NKO-Wt1GpA1tRkCbH6XQ3JRPL-jW1/exec';
 
-  const res = await fetch(APPS_SCRIPT_URL, {
-    method: "POST",
-    headers: {
-      "Content-Type": "text/plain;charset=utf-8"
-    },
-    body: body
-  });
+        // Local Memory Application State Structure Core
+        let dbState = {
+            Users: [],
+            Layout: [],
+            Beds: [],
+            History: []
+        };
 
-  const text = await res.text();
-  const json = JSON.parse(text);
+        let currentUserProfile = null;
+        let activeTargetBedIdSelected = null;
 
-  if(json.error) throw new Error(json.error);
-  return json;
-}
+        document.addEventListener("DOMContentLoaded", function() {
+            evaluateSessionRecoveryState();
+        });
 
-// Reload all data from Sheets and re-render
-async function syncAndRender(loadingText){
-  showLoading(loadingText||"Syncing...");
-  try {
-    const data = await apiGet("getData");
-    applyServerData(data);
-    refreshAll();
-  } catch(e){ alert("Sync failed: "+e.message); }
-  hideLoading();
-}
-
-// ── Auth ──────────────────────────────────────────────────────
-function allUsers(){ return [{username:"admin",password:"admin123",name:"Admin",role:"admin",allowedBlocks:["ALL"]}, ...wardens]; }
-
-async function login(){
-  const u = loginUsername.value.trim(), p = loginPassword.value.trim();
-  showLoading("Authenticating...");
-  try {
-    // Re-fetch users from sheet in case they changed
-    const data = await apiGet("getData");
-    applyServerData(data);
-    const user = allUsers().find(x => x.username===u && x.password===p);
-    hideLoading();
-    if(!user){ error.style.display="block"; return; }
-    sessionStorage.setItem("hostelSession", JSON.stringify(user));
-    showApp(user);
-  } catch(e){ hideLoading(); error.style.display="block"; }
-}
-
-function logout(){ sessionStorage.removeItem("hostelSession"); location.reload(); }
-
-function showApp(user){
-  currentUser = user;
-  loginPage.style.display = "none";
-  app.style.display = "block";
-  loggedUser.textContent = `${user.name} (${user.role})`;
-  adminPanel.style.display = user.role==="admin" ? "flex" : "none";
-  permissionPanel.style.display = user.role==="admin" ? "flex" : "none";
-  refreshAll();
-}
-
-function isAdmin(){ return currentUser && currentUser.role==="admin"; }
-function allowedBlocks(){ return isAdmin() ? hostelLayout.map(b=>b.block) : (currentUser.allowedBlocks||[]); }
-function canAccessBlock(block){ return isAdmin() || allowedBlocks().includes(block); }
-function accessibleLayout(){ return hostelLayout.filter(b=>canAccessBlock(b.block)); }
-
-// ── Bed ID helpers ────────────────────────────────────────────
-function bedId(b,f,r,n){ return `${b}__${f}__${r}__B${n}`; }
-function splitId(id){ const p=id.split("__"); return {block:p[0],floor:p[1],room:p[2],bed:p[3]}; }
-function clean(s){ return String(s).replaceAll("__","_").trim(); }
-
-// ── Render ────────────────────────────────────────────────────
-function render(){
-  const q=search.value.toLowerCase(), bf=blockFilter.value, ff=floorFilter.value, sf=statusFilter.value, fee=feeFilter.value;
-  let total=0, occ=0, vac=0, res=0, pending=0;
-  layoutBox.innerHTML="";
-
-  accessibleLayout().forEach(block => {
-    if(bf && block.block!==bf) return;
-    const blockDiv = document.createElement("div");
-    const bh = document.createElement("div");
-    bh.className = "block-title";
-    bh.innerHTML = `<h2>${esc(block.block)}</h2>`;
-    if(isAdmin()){
-      const del = document.createElement("button");
-      del.className="danger"; del.textContent="Delete Block";
-      del.onclick=()=>deleteBlock(block.block); bh.appendChild(del);
-    }
-    blockDiv.appendChild(bh);
-
-    block.floors.forEach(floor => {
-      if(ff && floor.floor!==ff) return;
-      const ft = document.createElement("h3");
-      ft.className="floor-title"; ft.textContent=floor.floor; blockDiv.appendChild(ft);
-      const rooms = document.createElement("div"); rooms.className="rooms";
-
-      floor.rooms.forEach(room => {
-        const rd = document.createElement("div"); rd.className="room";
-        const head = document.createElement("div"); head.className="room-head";
-        head.innerHTML=`<h3>Room ${esc(room.room)} - ${room.beds} Beds</h3>`;
-        if(isAdmin()){
-          const act=document.createElement("div"); act.className="actions";
-          const ab=document.createElement("button"); ab.className="mini primary"; ab.textContent="+ Bed"; ab.onclick=()=>addBedFromRoom(block.block,floor.floor,room.room);
-          const db=document.createElement("button"); db.className="mini danger"; db.textContent="Delete Room"; db.onclick=()=>deleteRoom(block.block,floor.floor,room.room);
-          act.append(ab,db); head.appendChild(act);
+        function showLoading(msg) {
+            document.getElementById('loader-text').innerText = msg;
+            document.getElementById('global-loader').style.display = 'flex';
         }
-        rd.appendChild(head);
-        const bedsDiv = document.createElement("div"); bedsDiv.className="beds";
 
-        for(let i=1; i<=room.beds; i++){
-          total++;
-          const id = bedId(block.block, floor.floor, room.room, i);
-          // ── FIX: always read from bedData; default to vacant if missing ──
-          const info = bedData[id] || {status:"vacant"};
-          const st = info.status || "vacant";
-
-          // ── Counters ──
-          if(st==="occupied") occ++;
-          else if(st==="reserved") res++;
-          else vac++;
-          if(info.feeStatus==="Pending" || info.feeStatus==="Partial") pending++;
-
-          // ── Search / filter ──
-          const hay = `${info.studentName||""} ${info.admissionNo||""} ${info.phone||""} ${info.idNo||""}`.toLowerCase();
-          if(q && !hay.includes(q) && st!=="vacant") continue;
-          if(q && st==="vacant") continue;
-          if(sf && st!==sf) continue;
-          if(fee && info.feeStatus!==fee) continue;
-
-          // ── Bed button — class derived from status directly ──
-          const btn = document.createElement("button");
-          // Always use the current status to set the colour class
-          btn.className = `bed ${st}`;
-          btn.onclick = ()=>openBed(id, block.block, floor.floor, room.room, i);
-          btn.innerHTML = `Bed ${i}<small>${st==="vacant"?"Vacant":esc(info.studentName||st)}</small><small>${esc(info.admissionNo||info.feeStatus||"Click to allot")}</small>`;
-          bedsDiv.appendChild(btn);
+        function hideLoading() {
+            document.getElementById('global-loader').style.display = 'none';
         }
-        rd.appendChild(bedsDiv); rooms.appendChild(rd);
-      });
-      blockDiv.appendChild(rooms);
-    });
-    layoutBox.appendChild(blockDiv);
-  });
 
-  // ── Stats ──
-  totalBeds.textContent  = total;
-  occupiedBeds.textContent = occ;
-  vacantBeds.textContent   = vac;
-  reservedBeds.textContent = res;
-  feePending.textContent   = pending;
+        /******************************************************************
+         * SYNCHRONIZATION CONNECTOR OVER CLOUD STACK WIRE PIPELINE PIPES
+         ******************************************************************/
+        async function fetchSystemStateFromCloud() {
+            showLoading("Downloading remote structures from core ecosystem cloud storage nodes...");
+            try {
+                const response = await fetch(`${API_URL}?action=load`);
+                const result = await response.json();
+                if (result.success) {
+                    dbState.Users = result.data.Users || [];
+                    dbState.Layout = result.data.Layout || [];
+                    dbState.Beds = result.data.Beds || [];
+                    dbState.History = result.data.History || [];
+                    
+                    // Maintain and enforce downstream consistency integrity properties on data elements
+                    reconcileBedsDataMatrixStructure();
+                    
+                    // Refresh view presentation layouts dynamically
+                    buildDynamicFiltersMappingElements();
+                    renderDashboardLayout();
+                    renderOccupantsTable();
+                    renderLayoutControlMatrixTable();
+                    renderUserManagementControlMatrixTable();
+                    renderHistoryLogControlMatrixTable();
+                } else {
+                    alert("Cloud Engine Interface Rejection Error: " + result.message);
+                }
+            } catch (error) {
+                console.error(error);
+                alert("Fatal Engine Request Fail Connection Error. Review local implementation API_URL mappings logic rules configuration profile mappings parameter.");
+            } finally {
+                hideLoading();
+            }
+        }
 
-  showList(); showHistory();
-}
+        async function pushSystemStateToCloud() {
+            showLoading("Uploading data back down into cloud database filesystems nodes...");
+            try {
+                const payload = {
+                    action: 'save',
+                    data: dbState
+                };
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    mode: 'cors',
+                    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                    body: JSON.stringify(payload)
+                });
+                const result = await response.json();
+                if (!result.success) {
+                    alert("Failed cloud execution validation persistence logic: " + result.message);
+                }
+            } catch (error) {
+                console.error(error);
+                alert("Data mutation execution error sync operation dropped down cloud pipeline layer stack elements.");
+            } finally {
+                hideLoading();
+            }
+        }
 
-// ── Bed modal ─────────────────────────────────────────────────
-function openBed(id,b,f,r,n){
-  if(!canAccessBlock(b)) return alert("No permission for this block.");
-  selectedBedId = id;
-  const info = bedData[id] || {status:"vacant", feeStatus:"Paid"};
-  modalTitle.textContent = `${b} / ${f} / Room ${r} / Bed ${n}`;
-  ["status","admissionNo","studentName","phone","guardian","idType","idNo","joinDate","monthlyFee","notes"]
-    .forEach(x => document.getElementById(x).value = info[x]||"");
-  feeStatus.value = info.feeStatus||"Paid";
-  fillTransfer(id);
-  bedModal.style.display="flex";
-}
+        /******************************************************************
+         * CONSISTENCY ENGINE: AUTOMATIC GENERATION & RECONCILIATION OF INDIVIDUAL BEDS
+         ******************************************************************/
+        function reconcileBedsDataMatrixStructure() {
+            const expectedBedIds = new Set();
+            
+            dbState.Layout.forEach(layoutRow => {
+                const totalBedsNum = parseInt(layoutRow.Beds) || 0;
+                const blockKeyStr = layoutRow.Block.trim();
+                const floorKeyStr = layoutRow.Floor.trim();
+                const roomKeyStr = layoutRow.Room.toString().trim();
+                
+                for (let i = 1; i <= totalBedsNum; i++) {
+                    const uniqueIdCompositeKey = `${blockKeyStr}_${floorKeyStr}_${roomKeyStr}_B${i}`;
+                    expectedBedIds.add(uniqueIdCompositeKey);
+                    
+                    // Match up array profile search check
+                    const foundExistingBedRecord = dbState.Beds.find(b => b.BedID === uniqueIdCompositeKey);
+                    if (!foundExistingBedRecord) {
+                        dbState.Beds.push({
+                            BedID: uniqueIdCompositeKey,
+                            Status: 'Vacant',
+                            AdmissionNo: '', StudentName: '', Course: '', Year: '',
+                            Phone: '', ParentPhone: '', Address: '', JoinDate: '', FeeStatus: ''
+                        });
+                    }
+                }
+            });
+            
+            // Clean up old orphan bed tracking items no longer defined in configuration layout matrix schemas
+            dbState.Beds = dbState.Beds.filter(bedUnitItem => expectedBedIds.has(bedUnitItem.BedID) || bedUnitItem.Status !== 'Vacant');
+        }
 
-function fillTransfer(current){
-  transferBed.innerHTML='<option value="">No transfer</option>';
-  accessibleLayout().forEach(b=>b.floors.forEach(f=>f.rooms.forEach(r=>{
-    for(let i=1;i<=r.beds;i++){
-      const id=bedId(b.block,f.floor,r.room,i);
-      const inf=bedData[id]||{status:"vacant"};
-      if(id!==current && inf.status==="vacant")
-        transferBed.add(new Option(`${b.block} / ${f.floor} / Room ${r.room} / Bed ${i}`, id));
-    }
-  })));
-}
+        /******************************************************************
+         * SESSION MANAGEMENT & SECURITY AUTHORIZATION SYSTEM
+         ******************************************************************/
+        function evaluateSessionRecoveryState() {
+            const savedProfileToken = localStorage.getItem('hostel_session_cache_token');
+            if (savedProfileToken) {
+                try {
+                    currentUserProfile = JSON.parse(savedProfileToken);
+                    bootSystemAppViewInterface();
+                } catch (e) {
+                    localStorage.removeItem('hostel_session_cache_token');
+                    hideLoading();
+                }
+            } else {
+                hideLoading();
+            }
+        }
 
-function closeModal(){ bedModal.style.display="none"; selectedBedId=null; }
+        function executeLogin(event) {
+            event.preventDefault();
+            showLoading("Verifying authorization login profile tokens structural schemas...");
+            
+            // Temporary intercept execution prior to fetch down sequence execution runtime layer maps
+            fetch(`${API_URL}?action=load`)
+            .then(res => res.json())
+            .then(result => {
+                if (result.success) {
+                    dbState.Users = result.data.Users || [];
+                    dbState.Layout = result.data.Layout || [];
+                    dbState.Beds = result.data.Beds || [];
+                    dbState.History = result.data.History || [];
+                    
+                    const userFieldInput = document.getElementById('login-username').value.trim();
+                    const passwordFieldInput = document.getElementById('login-password').value.trim();
+                    
+                    const matchedUserAccountRecord = dbState.Users.find(u => 
+                        u.Username.toLowerCase() === userFieldInput.toLowerCase() && 
+                        u.Password.toString() === passwordFieldInput
+                    );
 
-async function saveBed(){
-  if(!selectedBedId) return;
+                    if (matchedUserAccountRecord) {
+                        if (matchedUserAccountRecord.Active.toString().toUpperCase() !== 'TRUE') {
+                            alert("Access Denied: This account is currently flagged as Inactive.");
+                            hideLoading();
+                            return;
+                        }
+                        
+                        currentUserProfile = {
+                            Username: matchedUserAccountRecord.Username,
+                            Name: matchedUserAccountRecord.Name,
+                            Role: matchedUserAccountRecord.Role,
+                            AllowedBlocks: matchedUserAccountRecord.AllowedBlocks
+                        };
+                        
+                        localStorage.setItem('hostel_session_cache_token', JSON.stringify(currentUserProfile));
+                        bootSystemAppViewInterface();
+                    } else {
+                        alert("Invalid credentials. Access Denied.");
+                        hideLoading();
+                    }
+                } else {
+                    alert("Initialization error connection failed: " + result.message);
+                    hideLoading();
+                }
+            }).catch(err => {
+                alert("Fatal API Endpoint resolution drop out map error: " + err.toString());
+                hideLoading();
+            });
+        }
 
-  const oldBedId = selectedBedId;
-  const p = splitId(oldBedId);
+        function bootSystemAppViewInterface() {
+            document.getElementById('login-container').style.display = 'none';
+            document.getElementById('app-container').style.display = 'flex';
+            
+            document.getElementById('user-display-name').innerText = currentUserProfile.Name;
+            document.getElementById('user-display-role').innerText = currentUserProfile.Role;
+            
+            // Process RBAC security rule layouts context
+            document.querySelectorAll('.admin-only').forEach(element => {
+                element.style.display = (currentUserProfile.Role === 'Admin') ? '' : 'none';
+            });
+            document.querySelectorAll('.principal-only').forEach(element => {
+                element.style.display = (currentUserProfile.Role === 'Admin' || currentUserProfile.Role === 'Principal') ? '' : 'none';
+            });
 
-  if(!canAccessBlock(p.block)) return alert("No permission.");
+            reconcileBedsDataMatrixStructure();
+            buildDynamicFiltersMappingElements();
+            renderDashboardLayout();
+            renderOccupantsTable();
+            renderLayoutControlMatrixTable();
+            renderUserManagementControlMatrixTable();
+            renderHistoryLogControlMatrixTable();
+            
+            hideLoading();
+        }
 
-  const obj = {
-    status: status.value,
-    feeStatus: feeStatus.value,
-    admissionNo: admissionNo.value.trim(),
-    studentName: studentName.value.trim(),
-    phone: phone.value.trim(),
-    guardian: guardian.value.trim(),
-    idType: idType.value,
-    idNo: idNo.value.trim(),
-    joinDate: joinDate.value,
-    monthlyFee: monthlyFee.value,
-    notes: notes.value.trim(),
-    updatedAt: new Date().toLocaleString(),
-    updatedBy: currentUser.username
-  };
+        function executeLogout() {
+            localStorage.removeItem('hostel_session_cache_token');
+            currentUserProfile = null;
+            document.getElementById('app-container').style.display = 'none';
+            document.getElementById('login-container').style.display = 'flex';
+            document.getElementById('login-form').reset();
+        }
 
-  const target = transferBed.value;
+        function switchTab(targetViewId) {
+            document.querySelectorAll('.nav-link').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.view-panel').forEach(panel => panel.classList.remove('active'));
+            
+            // Locate dynamic click binding source target contexts
+            const navButtons = Array.from(document.querySelectorAll('.nav-link'));
+            const matchBtn = navButtons.find(b => b.getAttribute('onclick').includes(targetViewId));
+            if (matchBtn) matchBtn.classList.add('active');
+            
+            const targetPanel = document.getElementById(`view-${targetViewId}`);
+            if (targetPanel) targetPanel.classList.add('active');
+        }
 
-  if(target && obj.status !== "vacant"){
-    bedData[target] = {...obj};
-    bedData[oldBedId] = {status:"vacant"};
-    closeModal();
-    render();
+        /******************************************************************
+         * DYNAMIC INTERFACE FILTER POPULATION ARCHITECTURES
+         ******************************************************************/
+        function buildDynamicFiltersMappingElements() {
+            const blockSelectFilter = document.getElementById('dash-filter-block');
+            const structuralBlocksSet = new Set();
+            
+            dbState.Layout.forEach(l => {
+                if (l.Block && l.Block.trim() !== "") structuralBlocksSet.add(l.Block.trim());
+            });
 
-    showLoading("Saving transfer...");
-    try {
-      await apiPost("transferBed",{
-        fromBedId: oldBedId,
-        toBedId: target,
-        bedInfo: obj,
-        updatedBy: currentUser.username,
-        ...p
-      });
-    } catch(e){
-      alert("Save failed: " + e.message);
-    }
+            // Re-verify Warden filter rule boundaries
+            let allowedBlocksListArray = [];
+            if (currentUserProfile.Role === 'Warden') {
+                allowedBlocksListArray = currentUserProfile.AllowedBlocks.split(',').map(s => s.trim());
+            } else {
+                allowedBlocksListArray = Array.from(structuralBlocksSet);
+            }
 
-    await syncAndRender("Refreshing...");
-  } else {
-    if(obj.status === "vacant"){
-      bedData[oldBedId] = {status:"vacant"};
-    } else {
-      bedData[oldBedId] = {...obj};
-    }
+            blockSelectFilter.innerHTML = '';
+            
+            if (currentUserProfile.Role !== 'Warden') {
+                const optAll = document.createElement('option');
+                optAll.value = "All";
+                optAll.innerText = "All Configured Blocks";
+                blockSelectFilter.appendChild(optAll);
+            }
 
-    closeModal();
-    render();
+            allowedBlocksListArray.forEach(bName => {
+                if(currentUserProfile.Role !== 'Warden' || structuralBlocksSet.has(bName)) {
+                    const opt = document.createElement('option');
+                    opt.value = bName;
+                    opt.innerText = bName;
+                    blockSelectFilter.appendChild(opt);
+                }
+            });
 
-    showLoading("Saving...");
-    try {
-      await apiPost("saveBed",{
-        bedId: oldBedId,
-        bedInfo: obj,
-        updatedBy: currentUser.username,
-        ...p
-      });
-    } catch(e){
-      alert("Save failed: " + e.message);
-    }
+            // Floor drop-down auto generation logic check maps
+            const floorSelectFilter = document.getElementById('dash-filter-floor');
+            const structuralFloorsSet = new Set();
+            dbState.Layout.forEach(l => {
+                if(l.Floor && l.Floor.trim() !== "") structuralFloorsSet.add(l.Floor.trim());
+            });
+            
+            floorSelectFilter.innerHTML = '<option value="All">All Floors Map</option>';
+            structuralFloorsSet.forEach(fName => {
+                const opt = document.createElement('option');
+                opt.value = fName;
+                opt.innerText = fName;
+                floorSelectFilter.appendChild(opt);
+            });
+        }
 
-    await syncAndRender("Refreshing...");
-  }
-}
+        /******************************************************************
+         * RENDERING COMPONENT: DASHBOARD COUNTERS & MATRIX RENDER MAP
+         ******************************************************************/
+        function renderDashboardLayout() {
+            // Recalculate runtime analytical metric tracking models counters live from local memory array cache block elements
+            let totalBedsCount = 0;
+            let vacantBedsCount = 0;
+            let occupiedBedsCount = 0;
+            let reservedBedsCount = 0;
+            let pendingFeesCount = 0;
 
-  const target = transferBed.value;
-  if(target && obj.status!=="vacant"){
-    const tp = splitId(target);
-    if(!canAccessBlock(tp.block)) return alert("No permission for target block.");
-    // ── Optimistic local update ──
-    bedData[target] = {...obj};
-    bedData[selectedBedId] = {status:"vacant"};
-    closeModal(); render();
-    // ── Persist to Sheets ──
-    showLoading("Saving transfer...");
-    try {
-      await apiPost("transferBed",{
-        fromBedId: selectedBedId, toBedId: target,
-        bedInfo: obj, updatedBy: currentUser.username,
-        ...p
-      });
-    } catch(e){ alert("Save failed: "+e.message); }
-    await syncAndRender("Refreshing...");
-  } else {
-    // ── Optimistic local update — this is the key fix ──
-    if(obj.status==="vacant"){
-      bedData[selectedBedId] = {status:"vacant"};
-    } else {
-      bedData[selectedBedId] = {...obj};
-    }
-    closeModal(); render();   // <-- render AFTER updating bedData in memory
-    // ── Persist to Sheets ──
-    showLoading("Saving...");
-    try {
-      await apiPost("saveBed",{
-        bedId: selectedBedId, bedInfo: obj,
-        updatedBy: currentUser.username, ...p
-      });
-    } catch(e){ alert("Save failed: "+e.message); }
-    await syncAndRender("Refreshing...");
-  }
-}
+            // Compute metrics specifically over user scoped block visualization matrices boundaries
+            const blockFilterSelectionValue = document.getElementById('dash-filter-block').value;
+            const floorFilterSelectionValue = document.getElementById('dash-filter-floor').value;
+            const statusFilterSelectionValue = document.getElementById('dash-filter-status').value;
+            const searchFieldFilterTextString = document.getElementById('dash-search').value.toLowerCase().trim();
 
-async function makeVacant(){
-  if(!selectedBedId) return;
-  const p = splitId(selectedBedId);
-  if(!canAccessBlock(p.block)) return alert("No permission.");
-  if(!confirm("Make this bed vacant?")) return;
-  bedData[selectedBedId] = {status:"vacant"};
-  closeModal(); render();
-  showLoading("Saving...");
-  try {
-    await apiPost("makeVacant",{ bedId: selectedBedId, updatedBy: currentUser.username, ...p });
-  } catch(e){ alert("Save failed: "+e.message); }
-  await syncAndRender("Refreshing...");
-}
+            // Establish visibility rules filtering criteria sets
+            let interactiveFilteredBedsList = dbState.Beds.filter(bed => {
+                const tokens = bed.BedID.split('_');
+                const bBlock = tokens[0];
+                const bFloor = tokens[1];
+                
+                // Enforce Warden structural boundaries scope checks rules logic
+                if (currentUserProfile.Role === 'Warden') {
+                    const allowedArr = currentUserProfile.AllowedBlocks.split(',').map(s => s.trim());
+                    if (!allowedArr.includes(bBlock)) return false;
+                }
 
-async function checkoutBed(){
-  if(!selectedBedId) return;
-  const p = splitId(selectedBedId);
-  if(!canAccessBlock(p.block)) return alert("No permission.");
-  const info = bedData[selectedBedId];
-  if(!info || info.status==="vacant") return alert("No occupant to checkout.");
-  if(!confirm("Checkout student and move to history?")) return;
-  const rec = {...p, ...info, checkoutDate: new Date().toLocaleDateString(), checkoutBy: currentUser.username};
-  checkoutHistory.unshift(rec);
-  bedData[selectedBedId] = {status:"vacant"};
-  closeModal(); render();
-  showLoading("Saving checkout...");
-  try {
-    await apiPost("checkoutBed",{ bedId: selectedBedId, bedInfo: info, ...p, checkoutBy: currentUser.username });
-  } catch(e){ alert("Save failed: "+e.message); }
-  await syncAndRender("Refreshing...");
-}
+                if (blockFilterSelectionValue !== 'All' && bBlock !== blockFilterSelectionValue) return false;
+                if (floorFilterSelectionValue !== 'All' && bFloor !== floorFilterSelectionValue) return false;
+                if (statusFilterSelectionValue !== 'All' && bed.Status !== statusFilterSelectionValue) return false;
+                
+                if (searchFieldFilterTextString !== '') {
+                    const matchAdmissionStr = bed.AdmissionNo.toLowerCase().includes(searchFieldFilterTextString);
+                    const matchNameStr = bed.StudentName.toLowerCase().includes(searchFieldFilterTextString);
+                    const matchPhoneStr = bed.Phone.toLowerCase().includes(searchFieldFilterTextString);
+                    if (!matchAdmissionStr && !matchNameStr && !matchPhoneStr) return false;
+                }
+                
+                return true;
+            });
 
-// ── Layout admin ──────────────────────────────────────────────
-async function addBlock(){
-  if(!isAdmin()) return alert("Only admin");
-  const n=clean(newBlock.value);
-  if(!n) return alert("Enter block name");
-  if(hostelLayout.some(b=>b.block.toLowerCase()===n.toLowerCase())) return alert("Block exists");
-  hostelLayout.push({block:n, floors:[]});
-  newBlock.value=""; refreshAll();
-  showLoading("Saving layout...");
-  try { await apiPost("saveLayout",{layout:hostelLayout,updatedBy:currentUser.username}); } catch(e){ alert("Save failed: "+e.message); }
-  await syncAndRender("Refreshing...");
-}
+            // Calculate overall master live counts metrics metrics definitions tracking parameters loops
+            dbState.Beds.forEach(bed => {
+                const tokens = bed.BedID.split('_');
+                const bBlock = tokens[0];
+                
+                if (currentUserProfile.Role === 'Warden') {
+                    const allowedArr = currentUserProfile.AllowedBlocks.split(',').map(s => s.trim());
+                    if (!allowedArr.includes(bBlock)) return;
+                }
 
-function deleteSelectedBlock(){ const b=adminBlock.value; if(!b) return alert("Select block"); deleteBlock(b); }
+                totalBedsCount++;
+                if (bed.Status === 'Vacant') vacantBedsCount++;
+                if (bed.Status === 'Occupied') occupiedBedsCount++;
+                if (bed.Status === 'Reserved') reservedBedsCount++;
+                if (bed.Status === 'Occupied' && bed.FeeStatus === 'Pending') pendingFeesCount++;
+            });
 
-async function deleteBlock(b){
-  if(!isAdmin()) return alert("Only admin");
-  if(!confirm(`Delete ${b} with all data?`)) return;
-  hostelLayout = hostelLayout.filter(x=>x.block!==b);
-  Object.keys(bedData).forEach(id=>{ if(id.startsWith(b+"__")) delete bedData[id]; });
-  wardens.forEach(w=>w.allowedBlocks=w.allowedBlocks.filter(x=>x!==b));
-  refreshAll();
-  showLoading("Saving...");
-  try { await apiPost("saveLayout",{layout:hostelLayout,updatedBy:currentUser.username}); } catch(e){ alert("Save failed: "+e.message); }
-  await syncAndRender("Refreshing...");
-}
+            // Update UI widgets nodes references numbers structures parameters counters elements
+            document.getElementById('count-total').innerText = totalBedsCount;
+            document.getElementById('count-vacant').innerText = vacantBedsCount;
+            document.getElementById('count-occupied').innerText = occupiedBedsCount;
+            document.getElementById('count-reserved').innerText = reservedBedsCount;
+            document.getElementById('count-pending').innerText = pendingFeesCount;
 
-async function addFloor(){
-  if(!isAdmin()) return alert("Only admin");
-  const b=adminBlock.value, f=clean(newFloor.value);
-  const block=hostelLayout.find(x=>x.block===b);
-  if(!block||!f) return alert("Select block and enter floor");
-  if(block.floors.some(x=>x.floor.toLowerCase()===f.toLowerCase())) return alert("Floor exists");
-  block.floors.push({floor:f, rooms:[]}); newFloor.value=""; refreshAll();
-  showLoading("Saving...");
-  try { await apiPost("saveLayout",{layout:hostelLayout,updatedBy:currentUser.username}); } catch(e){ alert("Save failed: "+e.message); }
-  await syncAndRender("Refreshing...");
-}
+            // Group and render filtered interactive bed structures nested inside rooms layout blocks mapping cards
+            const gridContainerElementBox = document.getElementById('interactive-room-grid');
+            gridContainerElementBox.innerHTML = '';
 
-async function deleteSelectedFloor(){
-  if(!isAdmin()) return alert("Only admin");
-  const b=adminBlock.value, f=adminFloor.value;
-  if(!b||!f) return alert("Select block and floor");
-  if(!confirm(`Delete ${f} with all rooms and data?`)) return;
-  const block=hostelLayout.find(x=>x.block===b);
-  block.floors=block.floors.filter(x=>x.floor!==f);
-  Object.keys(bedData).forEach(id=>{ if(id.startsWith(b+"__"+f+"__")) delete bedData[id]; });
-  refreshAll();
-  showLoading("Saving...");
-  try { await apiPost("saveLayout",{layout:hostelLayout,updatedBy:currentUser.username}); } catch(e){ alert("Save failed: "+e.message); }
-  await syncAndRender("Refreshing...");
-}
+            if (interactiveFilteredBedsList.length === 0) {
+                gridContainerElementBox.innerHTML = '<div style="grid-column: 1/-1; text-align: center; color: var(--text-muted); padding: 40px;">No operational rooms/beds match your chosen criteria configuration options filters.</div>';
+                return;
+            }
 
-async function addRoom(){
-  if(!isAdmin()) return alert("Only admin");
-  const b=adminBlock.value, f=adminFloor.value, r=clean(newRoom.value), beds=parseInt(newBeds.value);
-  const floor=getFloor(b,f);
-  if(!floor||!r||!beds) return alert("Select floor, enter room and beds");
-  if(floor.rooms.some(x=>x.room.toLowerCase()===r.toLowerCase())) return alert("Room exists");
-  floor.rooms.push({room:r, beds}); newRoom.value=""; refreshAll();
-  showLoading("Saving...");
-  try { await apiPost("saveLayout",{layout:hostelLayout,updatedBy:currentUser.username}); } catch(e){ alert("Save failed: "+e.message); }
-  await syncAndRender("Refreshing...");
-}
+            // Map down tracking maps group matrices structures fields indexes mapping values grouping blocks
+            const roomGroupingsMaps = {};
+            interactiveFilteredBedsList.forEach(bed => {
+                const tokens = bed.BedID.split('_');
+                const blockKey = tokens[0];
+                const floorKey = tokens[1];
+                const roomKey = tokens[2];
+                const roomCompositeIdUnique = `${blockKey} ➔ ${floorKey} ➔ Room ${roomKey}`;
+                
+                if (!roomGroupingsMaps[roomCompositeIdUnique]) {
+                    roomGroupingsMaps[roomCompositeIdUnique] = [];
+                }
+                roomGroupingsMaps[roomCompositeIdUnique].push(bed);
+            });
 
-function deleteSelectedRoom(){ deleteRoom(adminBlock.value, adminFloor.value, adminRoom.value); }
+            // Render loop operations
+            for (let roomTitleNameKey in roomGroupingsMaps) {
+                const roomCardWrapper = document.createElement('div');
+                roomCardWrapper.className = 'room-card';
+                
+                const rHeader = document.createElement('div');
+                rHeader.className = 'room-header';
+                rHeader.innerHTML = `<span>${roomTitleNameKey}</span>`;
+                roomCardWrapper.appendChild(rHeader);
+                
+                const bedsFlexContainer = document.createElement('div');
+                bedsFlexContainer.className = 'beds-container';
+                
+                roomGroupingsMaps[roomTitleNameKey].forEach(bedNodeItem => {
+                    const tokens = bedNodeItem.BedID.split('_');
+                    const bedLabelTextIndexString = tokens[3]; // e.g. "B1"
+                    
+                    const bedUnitDivNodeElement = document.createElement('div');
+                    bedUnitDivNodeElement.className = `bed-unit ${bedNodeItem.Status.toLowerCase()}`;
+                    bedUnitDivNodeElement.innerText = bedLabelTextIndexString;
+                    bedUnitDivNodeElement.title = `Bed Location: ${bedNodeItem.BedID} (${bedNodeItem.Status})`;
+                    
+                    bedUnitDivNodeElement.onclick = () => openBedSystemModalExecutionGateway(bedNodeItem.BedID);
+                    
+                    bedsFlexContainer.appendChild(bedUnitDivNodeElement);
+                });
+                
+                roomCardWrapper.appendChild(bedsFlexContainer);
+                gridContainerElementBox.appendChild(roomCardWrapper);
+            }
+        }
 
-async function deleteRoom(b,f,r){
-  if(!isAdmin()) return alert("Only admin");
-  if(!b||!f||!r) return alert("Select room");
-  if(!confirm(`Delete room ${r} and its data?`)) return;
-  const floor=getFloor(b,f);
-  floor.rooms=floor.rooms.filter(x=>x.room!==r);
-  Object.keys(bedData).forEach(id=>{ if(id.startsWith(b+"__"+f+"__"+r+"__")) delete bedData[id]; });
-  refreshAll();
-  showLoading("Saving...");
-  try { await apiPost("saveLayout",{layout:hostelLayout,updatedBy:currentUser.username}); } catch(e){ alert("Save failed: "+e.message); }
-  await syncAndRender("Refreshing...");
-}
+        /******************************************************************
+         * REGISTRY RENDERING VIEW LOGIC: ACTIVE OCCUPANTS LIST TABLE MATRIX
+         ******************************************************************/
+        function renderOccupantsTable() {
+            const tableBodyNode = document.getElementById('occupants-table-body');
+            tableBodyNode.innerHTML = '';
+            
+            const searchFieldFilterValueString = document.getElementById('roster-search').value.toLowerCase().trim();
+            const feeFilterSelectionValue = document.getElementById('roster-filter-fee').value;
 
-async function addOneBed(){
-  if(!isAdmin()) return alert("Only admin");
-  const room=getRoom(adminBlock.value, adminFloor.value, adminRoom.value);
-  if(!room) return alert("Select room"); room.beds++; refreshAll();
-  showLoading("Saving...");
-  try { await apiPost("saveLayout",{layout:hostelLayout,updatedBy:currentUser.username}); } catch(e){ alert("Save failed: "+e.message); }
-  await syncAndRender("Refreshing...");
-}
+            const occupiedAllotmentsList = dbState.Beds.filter(b => {
+                if (b.Status !== 'Occupied') return false;
+                
+                const tokens = b.BedID.split('_');
+                const bBlock = tokens[0];
+                
+                if (currentUserProfile.Role === 'Warden') {
+                    const allowedArr = currentUserProfile.AllowedBlocks.split(',').map(s => s.trim());
+                    if (!allowedArr.includes(bBlock)) return false;
+                }
 
-async function addBedFromRoom(b,f,r){
-  if(!isAdmin()) return alert("Only admin");
-  const room=getRoom(b,f,r); room.beds++; refreshAll();
-  showLoading("Saving...");
-  try { await apiPost("saveLayout",{layout:hostelLayout,updatedBy:currentUser.username}); } catch(e){ alert("Save failed: "+e.message); }
-  await syncAndRender("Refreshing...");
-}
+                if (feeFilterSelectionValue !== 'All' && b.FeeStatus !== feeFilterSelectionValue) return false;
+                
+                if (searchFieldFilterValueString !== '') {
+                    const mAdm = b.AdmissionNo.toLowerCase().includes(searchFieldFilterValueString);
+                    const mName = b.StudentName.toLowerCase().includes(searchFieldFilterValueString);
+                    const mPhone = b.Phone.toLowerCase().includes(searchFieldFilterValueString);
+                    if (!mAdm && !mName && !mPhone) return false;
+                }
+                
+                return true;
+            });
 
-function getFloor(b,f){ const block=hostelLayout.find(x=>x.block===b); return block?block.floors.find(x=>x.floor===f):null; }
-function getRoom(b,f,r){ const floor=getFloor(b,f); return floor?floor.rooms.find(x=>x.room===r):null; }
+            if (occupiedAllotmentsList.length === 0) {
+                tableBodyNode.innerHTML = '<tr><td colspan="9" style="text-align:center; color: var(--text-muted);">No active allocated student records found matching the conditions.</td></tr>';
+                return;
+            }
 
-// ── Warden management ─────────────────────────────────────────
-async function saveWarden(){
-  if(!isAdmin()) return alert("Only admin");
-  const name=wardenName.value.trim(), username=wardenUsername.value.trim(), password=wardenPassword.value.trim();
-  const blocks=[...document.querySelectorAll(".blockCheck:checked")].map(x=>x.value);
-  if(!name||!username||!password) return alert("Enter name, username and password.");
-  if(username==="admin") return alert("Username admin is reserved.");
-  if(blocks.length===0) return alert("Select at least one block.");
-  const existing=wardens.find(w=>w.username===username);
-  if(existing){ existing.name=name; existing.password=password; existing.allowedBlocks=blocks; }
-  else wardens.push({username,password,name,role:"warden",allowedBlocks:blocks});
-  refreshPermissionPanel(); clearWardenForm();
-  showLoading("Saving warden...");
-  try { await apiPost("saveWardens",{wardens,updatedBy:currentUser.username}); } catch(e){ alert("Save failed: "+e.message); }
-  await syncAndRender("Refreshing...");
-  alert("Warden permission saved.");
-}
+            occupiedAllotmentsList.forEach(bedRowItem => {
+                const tokens = bedRowItem.BedID.split('_');
+                const rowTrNode = document.createElement('tr');
+                
+                rowTrNode.innerHTML = `
+                    <td><b>${bedRowItem.AdmissionNo}</b></td>
+                    <td>${bedRowItem.StudentName}</td>
+                    <td>${bedRowItem.Course} (${bedRowItem.Year})</td>
+                    <td>${tokens[0]}</td>
+                    <td>${tokens[1]}</td>
+                    <td>${tokens[2]}</td>
+                    <td><code style="background:#f1f5f9; padding:2px 6px; border-radius:4px;">${tokens[3]}</code></td>
+                    <td><span class="badge ${bedRowItem.FeeStatus.toLowerCase()}">${bedRowItem.FeeStatus}</span></td>
+                    <td>
+                        <button class="btn btn-secondary" style="padding: 4px 8px; font-size:12px;" onclick="openBedSystemModalExecutionGateway('${bedRowItem.BedID}')">Manage / View</button>
+                    </td>
+                `;
+                tableBodyNode.appendChild(rowTrNode);
+            });
+        }
 
-function loadWardenForEdit(){
-  const username=wardenSelect.value; const w=wardens.find(x=>x.username===username); if(!w) return;
-  wardenName.value=w.name; wardenUsername.value=w.username; wardenPassword.value=w.password;
-  document.querySelectorAll(".blockCheck").forEach(c=>c.checked=w.allowedBlocks.includes(c.value));
-}
+        /******************************************************************
+         * ROOM & TOPOLOGY CONFIGURATION ARCHITECTURE ENGINE LOGIC
+         ******************************************************************/
+        function renderLayoutControlMatrixTable() {
+            const containerLayoutTableBody = document.getElementById('layout-matrix-body');
+            containerLayoutTableBody.innerHTML = '';
+            
+            if (dbState.Layout.length === 0) {
+                containerLayoutTableBody.innerHTML = '<tr><td colspan="5" style="text-align:center; color:var(--text-muted);">No system structure mapping topologies created yet.</td></tr>';
+                return;
+            }
 
-async function deleteWarden(){
-  if(!isAdmin()) return;
-  const username=wardenSelect.value; if(!username) return alert("Select warden.");
-  if(!confirm("Delete warden login: "+username+"?")) return;
-  wardens=wardens.filter(w=>w.username!==username);
-  refreshPermissionPanel(); clearWardenForm();
-  showLoading("Saving...");
-  try { await apiPost("saveWardens",{wardens,updatedBy:currentUser.username}); } catch(e){ alert("Save failed: "+e.message); }
-  await syncAndRender("Refreshing...");
-}
+            dbState.Layout.forEach((layoutRow, rowIndexIdKey) => {
+                const rowTr = document.createElement('tr');
+                rowTr.innerHTML = `
+                    <td>${layoutRow.Block}</td>
+                    <td>${layoutRow.Floor}</td>
+                    <td><b>Room ${layoutRow.Room}</b></td>
+                    <td>${layoutRow.Beds} Units Available</td>
+                    <td>
+                        <button class="btn btn-danger" style="padding: 4px 8px; font-size:12px;" onclick="removeLayoutUnitRecordIndex(${rowIndexIdKey})">Delete Node</button>
+                    </td>
+                `;
+                containerLayoutTableBody.appendChild(rowTr);
+            });
+        }
 
-function clearWardenForm(){ wardenName.value=""; wardenUsername.value=""; wardenPassword.value=""; document.querySelectorAll(".blockCheck").forEach(c=>c.checked=false); }
+        function addNewLayoutUnit(event) {
+            event.preventDefault();
+            const bVal = document.getElementById('lay-block').value.trim();
+            const fVal = document.getElementById('lay-floor').value.trim();
+            const rVal = document.getElementById('lay-room').value.trim();
+            const bedsCountNum = parseInt(document.getElementById('lay-beds').value) || 0;
 
-function refreshPermissionPanel(){
-  if(!isAdmin()) return;
-  blockChecks.innerHTML = hostelLayout.map(b=>`<label><input type="checkbox" class="blockCheck" value="${esc(b.block)}"> ${esc(b.block)}</label>`).join("");
-  wardenSelect.innerHTML='<option value="">Select warden</option>';
-  wardens.forEach(w=>wardenSelect.add(new Option(`${w.name} (${w.username})`,w.username)));
-  wardenList.innerHTML = wardens.length
-    ? `<table><thead><tr><th>Name</th><th>Username</th><th>Allowed Blocks</th></tr></thead><tbody>${wardens.map(w=>`<tr><td>${esc(w.name)}</td><td>${esc(w.username)}</td><td>${esc(w.allowedBlocks.join(", "))}</td></tr>`).join("")}</tbody></table>`
-    : "<p>No wardens added.</p>";
-}
+            // Enforce layout schema uniqueness rules constraints logic execution maps
+            const isDuplicate = dbState.Layout.some(l => 
+                l.Block.toLowerCase() === bVal.toLowerCase() && 
+                l.Floor.toLowerCase() === fVal.toLowerCase() && 
+                l.Room.toString().toLowerCase() === rVal.toLowerCase()
+            );
 
-// ── Filters ───────────────────────────────────────────────────
-function refreshFilters(){
-  blockFilter.innerHTML='<option value="">All Blocks</option>';
-  floorFilter.innerHTML='<option value="">All Floors</option>';
-  const fs=new Set();
-  accessibleLayout().forEach(b=>{ blockFilter.add(new Option(b.block,b.block)); b.floors.forEach(f=>fs.add(f.floor)); });
-  [...fs].forEach(f=>floorFilter.add(new Option(f,f)));
-}
+            if (isDuplicate) {
+                alert("Aborted: This structural room deployment mapping specification already exists in this block & floor combo.");
+                return;
+            }
 
-function refreshAdminSelectors(){
-  if(!isAdmin()) return;
-  const ob=adminBlock.value, of=adminFloor.value, or_=adminRoom.value;
-  adminBlock.innerHTML="";
-  hostelLayout.forEach(b=>adminBlock.add(new Option(b.block,b.block)));
-  if(ob && hostelLayout.some(b=>b.block===ob)) adminBlock.value=ob;
-  adminFloor.innerHTML="";
-  const b=hostelLayout.find(x=>x.block===adminBlock.value);
-  if(b){ b.floors.forEach(f=>adminFloor.add(new Option(f.floor,f.floor))); if(of&&b.floors.some(f=>f.floor===of)) adminFloor.value=of; }
-  adminRoom.innerHTML="";
-  const f=b?b.floors.find(x=>x.floor===adminFloor.value):null;
-  if(f){ f.rooms.forEach(r=>adminRoom.add(new Option(`${r.room} (${r.beds} beds)`,r.room))); if(or_&&f.rooms.some(r=>r.room===or_)) adminRoom.value=or_; }
-}
+            dbState.Layout.push({ Block: bVal, Floor: fVal, Room: rVal, Beds: bedsCountNum });
+            
+            reconcileBedsDataMatrixStructure();
+            pushSystemStateToCloud();
+            buildDynamicFiltersMappingElements();
+            renderDashboardLayout();
+            renderLayoutControlMatrixTable();
+            
+            document.getElementById('layout-generation-form').reset();
+        }
 
-function refreshAll(){ refreshFilters(); refreshAdminSelectors(); refreshPermissionPanel(); render(); }
+        function removeLayoutUnitRecordIndex(indexKey) {
+            if (!confirm("Are you sure you want to delete this room layout topology configuration node map? Empty vacant beds will be scrubbed, but occupied allocation maps will hold state in the background until checkout.")) return;
+            
+            dbState.Layout.splice(indexKey, 1);
+            reconcileBedsDataMatrixStructure();
+            pushSystemStateToCloud();
+            buildDynamicFiltersMappingElements();
+            renderDashboardLayout();
+            renderLayoutControlMatrixTable();
+        }
 
-// ── List / History ────────────────────────────────────────────
-function showList(){
-  const rows=[];
-  Object.keys(bedData).forEach(id=>{ const info=bedData[id], p=splitId(id); if(canAccessBlock(p.block)&&info.status&&info.status!=="vacant") rows.push({...p,...info}); });
-  studentList.innerHTML = rows.length ? makeTable(rows,false) : "<p>No occupied/reserved beds.</p>";
-}
+        /******************************************************************
+         * ACCOUNT MANAGEMENT CONTROLLERS ARCHITECTURE LAYOUT ROSTER
+         ******************************************************************/
+        function renderUserManagementControlMatrixTable() {
+            const tbody = document.getElementById('user-matrix-body');
+            tbody.innerHTML = '';
 
-function showHistory(){
-  const rows=checkoutHistory.filter(h=>canAccessBlock(h.block));
-  historyList.innerHTML = rows.length ? makeTable(rows,true) : "<p>No checkout history.</p>";
-}
+            dbState.Users.forEach((userRow, indexRowIdKey) => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td><b>${userRow.Username}</b></td>
+                    <td>${userRow.Name}</td>
+                    <td><code style="background:#e2e8f0; padding:2px 4px; border-radius:4px;">${userRow.Role}</code></td>
+                    <td><small>${userRow.AllowedBlocks}</small></td>
+                    <td><span class="badge" style="background-color: ${userRow.Active.toString().toUpperCase() === 'TRUE' ? 'var(--vacant)' : 'var(--text-muted)'}">${userRow.Active}</span></td>
+                    <td>
+                        <button class="btn btn-secondary" style="padding: 4px 8px; font-size:12px;" onclick="loadUserAccountToFormFieldsByIndex(${indexRowIdKey})">Edit</button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
 
-function makeTable(rows,isHist){
-  return `<table><thead><tr><th>Block</th><th>Floor</th><th>Room</th><th>Bed</th><th>Admission</th><th>Name</th><th>Phone</th><th>Fee</th>${isHist?'<th>Checkout</th>':'<th>Status</th>'}</tr></thead><tbody>${rows.map(r=>`<tr><td>${esc(r.block)}</td><td>${esc(r.floor)}</td><td>${esc(r.room)}</td><td>${esc(r.bed)}</td><td>${esc(r.admissionNo||"")}</td><td>${esc(r.studentName||"")}</td><td>${esc(r.phone||"")}</td><td>${esc(r.feeStatus||"")}</td><td>${esc(isHist?r.checkoutDate:r.status)}</td></tr>`).join("")}</tbody></table>`;
-}
+        function saveUserAccount(event) {
+            event.preventDefault();
+            const uName = document.getElementById('usr-username').value.trim();
+            const uPass = document.getElementById('usr-password').value.trim();
+            const uFullName = document.getElementById('usr-name').value.trim();
+            const uRole = document.getElementById('usr-role').value;
+            const uBlocks = document.getElementById('usr-blocks').value.trim();
+            const uActive = document.getElementById('usr-active').value;
 
-function showTab(t){
-  layoutView.style.display  = t==="layout"  ? "block":"none";
-  listView.style.display    = t==="list"    ? "block":"none";
-  historyView.style.display = t==="history" ? "block":"none";
-  ["Layout","List","History"].forEach(x=>document.getElementById("tab"+x).classList.remove("active"));
-  document.getElementById("tab"+(t==="layout"?"Layout":t==="list"?"List":"History")).classList.add("active");
-}
+            const existingIndex = dbState.Users.findIndex(u => u.Username.toLowerCase() === uName.toLowerCase());
+            
+            const newUserObj = {
+                Username: uName,
+                Password: uPass,
+                Name: uFullName,
+                Role: uRole,
+                AllowedBlocks: uBlocks,
+                Active: uActive
+            };
 
-// ── Backup / Restore / CSV ─────────────────────────────────────
-function exportCSV(){
-  const rows=[["Block","Floor","Room","Bed","Status","Admission","Name","Phone","Guardian","ID Type","ID No","Fee Status","Monthly Fee","Join Date","Notes"]];
-  Object.keys(bedData).forEach(id=>{ const i=bedData[id],p=splitId(id); if(canAccessBlock(p.block)&&i.status&&i.status!=="vacant") rows.push([p.block,p.floor,p.room,p.bed,i.status,i.admissionNo||"",i.studentName||"",i.phone||"",i.guardian||"",i.idType||"",i.idNo||"",i.feeStatus||"",i.monthlyFee||"",i.joinDate||"",i.notes||""]); });
-  download("hostel_data.csv", rows.map(r=>r.map(v=>`"${String(v).replaceAll('"','""')}"`).join(",")).join("\n"), "text/csv");
-}
+            if (existingIndex > -1) {
+                dbState.Users[existingIndex] = newUserObj;
+            } else {
+                dbState.Users.push(newUserObj);
+            }
 
-function downloadBackup(){
-  download("hostel_backup.json", JSON.stringify({layout:hostelLayout,data:bedData,history:checkoutHistory,wardens},null,2), "application/json");
-}
+            pushSystemStateToCloud();
+            renderUserManagementControlMatrixTable();
+            document.getElementById('user-creation-form').reset();
+        }
 
-function restoreBackup(e){
-  if(!isAdmin()) return alert("Only admin can restore backup.");
-  const file=e.target.files[0]; if(!file) return;
-  const reader=new FileReader();
-  reader.onload=async ()=>{
-    try {
-      const b=JSON.parse(reader.result);
-      if(!b.layout||!b.data) throw Error();
-      if(!confirm("Restore backup? Current data will be replaced.")) return;
-      hostelLayout=b.layout; bedData=b.data; checkoutHistory=b.history||[]; wardens=b.wardens||[];
-      refreshAll();
-      showLoading("Restoring to Sheets...");
-      await apiPost("restoreBackup",{layout:b.layout, bedData:b.data, history:b.history||[], wardens:b.wardens||[], updatedBy:currentUser.username});
-      await syncAndRender("Refreshing...");
-    } catch(err){ hideLoading(); alert("Invalid backup file or save failed: "+err.message); }
-  };
-  reader.readAsText(file);
-}
+        function loadUserAccountToFormFieldsByIndex(idx) {
+            const user = dbState.Users[idx];
+            document.getElementById('usr-username').value = user.Username;
+            document.getElementById('usr-password').value = user.Password;
+            document.getElementById('usr-name').value = user.Name;
+            document.getElementById('usr-role').value = user.Role;
+            document.getElementById('usr-blocks').value = user.AllowedBlocks;
+            document.getElementById('usr-active').value = user.Active.toString().toUpperCase() === 'TRUE' ? 'TRUE' : 'FALSE';
+        }
 
-function download(name,content,type){ const blob=new Blob([content],{type}); const url=URL.createObjectURL(blob); const a=document.createElement("a"); a.href=url; a.download=name; a.click(); URL.revokeObjectURL(url); }
-function esc(s){ return String(s??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m])); }
+        /******************************************************************
+         * HISTORICAL ACCOUNTABILITY AUDIT LOGS DISPLAY RENDERING TRAIL
+         ******************************************************************/
+        function renderHistoryLogControlMatrixTable() {
+            const hBody = document.getElementById('history-log-body');
+            hBody.innerHTML = '';
+            
+            if (dbState.History.length === 0) {
+                hBody.innerHTML = '<tr><td colspan="6" style="text-align:center; color: var(--text-muted)">No check-out log records tracked yet inside core data files.</td></tr>';
+                return;
+            }
 
-loginPassword.addEventListener("keydown", e=>{ if(e.key==="Enter") login(); });
-init();
-</script>
+            // Render output descending order to surface recent checkouts first
+            const invertedHistoryArrayLog = [...dbState.History].reverse();
+            invertedHistoryArrayLog.forEach(logRowItem => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td><code>${logRowItem.AdmissionNo}</code></td>
+                    <td>${logRowItem.StudentName}</td>
+                    <td>${logRowItem.Room}</td>
+                    <td><small>${logRowItem.Bed}</small></td>
+                    <td>${logRowItem.CheckinDate}</td>
+                    <td><span class="badge occupied">${logRowItem.CheckoutDate}</span></td>
+                `;
+                hBody.appendChild(tr);
+            });
+        }
+
+        /******************************************************************
+         * DIALOG DIALOG OVERLAYS TRANSACTION CONTROLLER ROUTINES
+         ******************************************************************/
+        function openBedSystemModalExecutionGateway(bedIdCompositeKey) {
+            activeTargetBedIdSelected = bedIdCompositeKey;
+            const targetBedDataObj = dbState.Beds.find(b => b.BedID === bedIdCompositeKey);
+            
+            if (!targetBedDataObj) return;
+
+            document.getElementById('modal-bed-title').innerText = `Unit Management Node Map Location: ${bedIdCompositeKey.replace(/_/g, ' ➔ ')}`;
+            
+            const badgeElement = document.getElementById('modal-status-badge');
+            badgeElement.className = `badge ${targetBedDataObj.Status.toLowerCase()}`;
+            badgeElement.innerText = targetBedDataObj.Status;
+
+            // Adjust element visibility mappings dynamically based on contextual statuses
+            document.getElementById('modal-view-section').style.display = 'block';
+            document.getElementById('modal-allot-form-section').style.display = 'none';
+            
+            const viewOccupantArea = document.getElementById('modal-occupant-details');
+            
+            if (targetBedDataObj.Status === 'Occupied') {
+                viewOccupantArea.style.display = 'block';
+                document.getElementById('btn-trigger-allot').style.display = 'none';
+                document.getElementById('btn-trigger-checkout').style.display = '';
+                document.getElementById('btn-trigger-reserve').style.display = 'none';
+
+                // Map textual node value constraints elements references parameters properties
+                document.getElementById('lbl-adm').innerText = targetBedDataObj.AdmissionNo;
+                document.getElementById('lbl-name').innerText = targetBedDataObj.StudentName;
+                document.getElementById('lbl-course').innerText = targetBedDataObj.Course;
+                document.getElementById('lbl-year').innerText = targetBedDataObj.Year;
+                document.getElementById('lbl-phone').innerText = targetBedDataObj.Phone;
+                document.getElementById('lbl-parent').innerText = targetBedDataObj.ParentPhone;
+                document.getElementById('lbl-address').innerText = targetBedDataObj.Address;
+                document.getElementById('lbl-date').innerText = targetBedDataObj.JoinDate;
+                
+                const feeBadge = document.getElementById('lbl-fee');
+                feeBadge.className = `badge ${targetBedDataObj.FeeStatus.toLowerCase()}`;
+                feeBadge.innerText = targetBedDataObj.FeeStatus;
+            } else {
+                viewOccupantArea.style.display = 'none';
+                document.getElementById('btn-trigger-allot').style.display = '';
+                document.getElementById('btn-trigger-checkout').style.display = 'none';
+                document.getElementById('btn-trigger-reserve').style.display = '';
+                document.getElementById('btn-trigger-reserve').innerText = targetBedDataObj.Status === 'Reserved' ? 'Remove Reservation Hold' : 'Place Temporary Reserve Hold';
+            }
+
+            document.getElementById('bed-modal').classList.add('active');
+        }
+
+        function closeBedSystemModal() {
+            document.getElementById('bed-modal').classList.remove('active');
+            activeTargetBedIdSelected = null;
+        }
+
+        function showAllotmentFormView() {
+            document.getElementById('modal-view-section').style.display = 'none';
+            document.getElementById('modal-allot-form-section').style.display = 'block';
+            document.getElementById('bed-allotment-execution-form').reset();
+            
+            // Auto inject current calendar standard date formatting strings metric
+            document.getElementById('alt-date').value = new Date().toISOString().split('T')[0];
+        }
+
+        function cancelFormAllotmentReturnView() {
+            document.getElementById('modal-allot-form-section').style.display = 'none';
+            document.getElementById('modal-view-section').style.display = 'block';
+        }
+
+        function processBedAssignmentExecution(event) {
+            event.preventDefault();
+            
+            const inputAdmNoStr = document.getElementById('alt-adm').value.trim();
+            
+            // Rule constraint verification lookup routine logic path block validation checks
+            const isDuplicateAdmission = dbState.Beds.some(b => b.Status === 'Occupied' && b.AdmissionNo.toLowerCase() === inputAdmNoStr.toLowerCase());
+            if (isDuplicateAdmission) {
+                alert("Transaction Blocked: A student with this unique matching admission number has an existing active bed reservation.");
+                return;
+            }
+
+            const indexTargetMatch = dbState.Beds.findIndex(b => b.BedID === activeTargetBedIdSelected);
+            if (indexTargetMatch > -1) {
+                dbState.Beds[indexTargetMatch] = {
+                    BedID: activeTargetBedIdSelected,
+                    Status: 'Occupied',
+                    AdmissionNo: inputAdmNoStr,
+                    StudentName: document.getElementById('alt-name').value.trim(),
+                    Course: document.getElementById('alt-course').value.trim(),
+                    Year: document.getElementById('alt-year').value.trim(),
+                    Phone: document.getElementById('alt-phone').value.trim(),
+                    ParentPhone: document.getElementById('alt-parent').value.trim(),
+                    Address: document.getElementById('alt-address').value.trim(),
+                    JoinDate: document.getElementById('alt-date').value,
+                    FeeStatus: document.getElementById('alt-fee').value
+                };
+
+                pushSystemStateToCloud();
+                renderDashboardLayout();
+                renderOccupantsTable();
+                closeBedSystemModal();
+            }
+        }
+
+        function processBedCheckoutExecution() {
+            if (!confirm("Are you sure you want to finalize checkout settlements operations for this occupant? This action is irreversible and releases the bed unit back to vacant space maps instantly.")) return;
+
+            const indexTargetMatch = dbState.Beds.findIndex(b => b.BedID === activeTargetBedIdSelected);
+            if (indexTargetMatch > -1) {
+                const targetBedCheckedOut = dbState.Beds[indexTargetMatch];
+                const tokens = targetBedCheckedOut.BedID.split('_');
+                
+                // Write transaction log record node back out into the analytical history array map stream components
+                dbState.History.push({
+                    AdmissionNo: targetBedCheckedOut.AdmissionNo,
+                    StudentName: targetBedCheckedOut.StudentName,
+                    Room: `${tokens[0]} ➔ ${tokens[1]} ➔ Room ${tokens[2]}`,
+                    Bed: tokens[3],
+                    CheckinDate: targetBedCheckedOut.JoinDate,
+                    CheckoutDate: new Date().toISOString().split('T')[0]
+                });
+
+                // Flush out data fields to restore pure blank vacant structural maps states
+                dbState.Beds[indexTargetMatch] = {
+                    BedID: activeTargetBedIdSelected,
+                    Status: 'Vacant',
+                    AdmissionNo: '', StudentName: '', Course: '', Year: '',
+                    Phone: '', ParentPhone: '', Address: '', JoinDate: '', FeeStatus: ''
+                };
+
+                pushSystemStateToCloud();
+                renderDashboardLayout();
+                renderOccupantsTable();
+                renderHistoryLogControlMatrixTable();
+                closeBedSystemModal();
+            }
+        }
+
+        function toggleBedReservationState() {
+            const indexTargetMatch = dbState.Beds.findIndex(b => b.BedID === activeTargetBedIdSelected);
+            if (indexTargetMatch > -1) {
+                const currentStatus = dbState.Beds[indexTargetMatch].Status;
+                dbState.Beds[indexTargetMatch].Status = (currentStatus === 'Reserved') ? 'Vacant' : 'Reserved';
+                
+                pushSystemStateToCloud();
+                renderDashboardLayout();
+                closeBedSystemModal();
+            }
+        }
+
+        /******************************************************************
+         * RAW DATA TEXT EXPORT / IMPORT ENGINE LAYER PIPELINES INTEROP
+         ******************************************************************/
+        function convertArrayOfObjectsToCSV(dataRowsArray) {
+            if (!dataRowsArray || !dataRowsArray.length) return '';
+            
+            const headerKeys = Object.keys(dataRowsArray[0]);
+            const csvRowsList = [];
+            
+            // Assemble and sanitize standard comma isolated column definitions mapping entries
+            csvRowsList.push(headerKeys.join(','));
+            
+            for (let row of dataRowsArray) {
+                const values = headerKeys.map(headerKey => {
+                    const escapedTextValue = ('' + row[headerKey]).replace(/"/g, '""');
+                    return `"${escapedTextValue}"`;
+                });
+                csvRowsList.push(values.join(','));
+            }
+            
+            return csvRowsList.join('\n');
+        }
+
+        function parseCSVTextContentToArrays(rawTextContentString) {
+            const lineRows = rawTextContentString.split(/\r?\n/);
+            const outputRowsDataResultList = [];
+            if (lineRows.length === 0 || lineRows[0].trim() === "") return [];
+
+            // Tokenize CSV parameters with quote isolation logic blocks patterns matches
+            const splitCSVLinePatternRegex = /(".*?"|[^",\s]+)(?=\s*,|\s*$)/g;
+            
+            const rawHeadersLineArr = lineRows[0].split(',');
+            const cleanSanitizedHeadersList = rawHeadersLineArr.map(h => h.replace(/^["']|["']$/g, '').trim());
+
+            for (let i = 1; i < lineRows.length; i++) {
+                if (lineRows[i].trim() === "") continue;
+                
+                // Fast light matching parser operation splits 
+                let matchesArr = [];
+                let currentLineStr = lineRows[i];
+                
+                // Basic matching replacement split fallback option mechanics logic implementation rules maps
+                let rowValuesArray = [];
+                let insideQuoteBlockFlag = false;
+                let trackingValueBuffer = '';
+                
+                for(let charIdx=0; charIdx < currentLineStr.length; charIdx++) {
+                    let charNode = currentLineStr[charIdx];
+                    if(charNode === '"') {
+                        insideQuoteBlockFlag = !insideQuoteBlockFlag;
+                    } else if(charNode === ',' && !insideQuoteBlockFlag) {
+                        rowValuesArray.push(trackingValueBuffer.trim());
+                        trackingValueBuffer = '';
+                    } else {
+                        trackingValueBuffer += charNode;
+                    }
+                }
+                rowValuesArray.push(trackingValueBuffer.trim());
+
+                let rowDataObj = {};
+                cleanSanitizedHeadersList.forEach((headerNameKey, currentHeaderItemIndex) => {
+                    let extractedCellRawValue = rowValuesArray[currentHeaderItemIndex] || '';
+                    // Strip exterior boundary wrapping leftover string double quotes fields
+                    extractedCellRawValue = extractedCellRawValue.replace(/^["']|["']$/g, '').replace(/""/g, '"');
+                    rowDataObj[headerNameKey] = extractedCellRawValue;
+                });
+                outputRowsDataResultList.push(rowDataObj);
+            }
+            return outputRowsDataResultList;
+        }
+
+        function exportToCSV(targetSheetNameKeyStr) {
+            const dataToProcess = dbState[targetSheetNameKeyStr];
+            if (!dataToProcess || dataToProcess.length === 0) {
+                alert(`The target stream array data segment for ${targetSheetNameKeyStr} is completely bare empty. Action canceled.`);
+                return;
+            }
+            
+            const csvTextResultContent = convertArrayOfObjectsToCSV(dataToProcess);
+            const dynamicBlobBlobStreamDataHolder = new Blob([csvTextResultContent], { type: 'text/csv;charset=utf-8;' });
+            const temporaryDownloadAnchorLinkElement = document.createElement('a');
+            
+            const elementUrlAddressPointer = URL.createObjectURL(dynamicBlobBlobStreamDataHolder);
+            temporaryDownloadAnchorLinkElement.setAttribute('href', elementUrlAddressPointer);
+            temporaryDownloadAnchorLinkElement.setAttribute('download', `HostelSystem_Export_${targetSheetNameKeyStr}_${new Date().toISOString().split('T')[0]}.csv`);
+            temporaryDownloadAnchorLinkElement.style.visibility = 'hidden';
+            
+            document.body.appendChild(temporaryDownloadAnchorLinkElement);
+            temporaryDownloadAnchorLinkElement.click();
+            document.body.removeChild(temporaryDownloadAnchorLinkElement);
+        }
+
+        function triggerCSVImportProcess() {
+            const chosenTargetSheetContextKey = document.getElementById('import-target-sheet').value;
+            const targetFileInputNodeField = document.getElementById('import-file-input');
+            
+            if (targetFileInputNodeField.files.length === 0) {
+                alert("Selection missing: You must point to a standard text structural layout mapping file template .csv format map file source link first.");
+                return;
+            }
+
+            const targetSourceFileBlobHandle = targetFileInputNodeField.files[0];
+            const fileReaderInstanceStream = new FileReader();
+            
+            fileReaderInstanceStream.onload = function(eventEvent) {
+                const parsedTextResultString = eventEvent.target.result;
+                try {
+                    const structuralArraysDataParsedOutputResult = parseCSVTextContentToArrays(parsedTextResultString);
+                    
+                    if(structuralArraysDataParsedOutputResult.length === 0) {
+                        alert("Parsing execution aborted: No structured columns or records detected inside chosen target source flat-file stream elements wrapper.");
+                        return;
+                    }
+
+                    // Enforce verification structure validations check protocols mappings
+                    const sampleRequiredFieldsMapKeys = Object.keys(structuralArraysDataParsedOutputResult[0]);
+                    
+                    if (!confirm(`Warning: This operation will fully clear and destructively overwrite the active records layout for [ ${chosenTargetSheetContextKey} ] locally, replacing it with ${structuralArraysDataParsedOutputResult.length} rows. Do you wish to continue?`)) {
+                        return;
+                    }
+
+                    dbState[chosenTargetSheetContextKey] = structuralArraysDataParsedOutputResult;
+                    
+                    // Run downstream system cascades
+                    if (chosenTargetSheetContextKey === 'Layout' || chosenTargetSheetContextKey === 'Beds') {
+                        reconcileBedsDataMatrixStructure();
+                    }
+                    
+                    pushSystemStateToCloud();
+                    buildDynamicFiltersMappingElements();
+                    renderDashboardLayout();
+                    renderOccupantsTable();
+                    renderLayoutControlMatrixTable();
+                    renderUserManagementControlMatrixTable();
+                    renderHistoryLogControlMatrixTable();
+                    
+                    alert("Local array memory table update sync execution processing task finished successfully!");
+                    targetFileInputNodeField.value = '';
+                } catch(err) {
+                    alert("Failure parsing raw incoming file contents to data structural records matrix layout templates matching formats arrays error: " + err.toString());
+                }
+            };
+            
+            fileReaderInstanceStream.readAsText(targetSourceFileBlobHandle);
+        }
+    </script>
 </body>
 </html>
