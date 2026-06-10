@@ -401,7 +401,10 @@ function closeModal(){ bedModal.style.display="none"; selectedBedId=null; }
 
 async function saveBed(){
   if(!selectedBedId) return;
-  const p = splitId(selectedBedId);
+
+  const oldBedId = selectedBedId;
+  const p = splitId(oldBedId);
+
   if(!canAccessBlock(p.block)) return alert("No permission.");
 
   const obj = {
@@ -419,6 +422,54 @@ async function saveBed(){
     updatedAt: new Date().toLocaleString(),
     updatedBy: currentUser.username
   };
+
+  const target = transferBed.value;
+
+  if(target && obj.status !== "vacant"){
+    bedData[target] = {...obj};
+    bedData[oldBedId] = {status:"vacant"};
+    closeModal();
+    render();
+
+    showLoading("Saving transfer...");
+    try {
+      await apiPost("transferBed",{
+        fromBedId: oldBedId,
+        toBedId: target,
+        bedInfo: obj,
+        updatedBy: currentUser.username,
+        ...p
+      });
+    } catch(e){
+      alert("Save failed: " + e.message);
+    }
+
+    await syncAndRender("Refreshing...");
+  } else {
+    if(obj.status === "vacant"){
+      bedData[oldBedId] = {status:"vacant"};
+    } else {
+      bedData[oldBedId] = {...obj};
+    }
+
+    closeModal();
+    render();
+
+    showLoading("Saving...");
+    try {
+      await apiPost("saveBed",{
+        bedId: oldBedId,
+        bedInfo: obj,
+        updatedBy: currentUser.username,
+        ...p
+      });
+    } catch(e){
+      alert("Save failed: " + e.message);
+    }
+
+    await syncAndRender("Refreshing...");
+  }
+}
 
   const target = transferBed.value;
   if(target && obj.status!=="vacant"){
