@@ -1547,41 +1547,50 @@
             document.getElementById('modal-view-section').style.display = 'block';
         }
 
-        function processBedAssignmentExecution(event) {
-            event.preventDefault();
-            
-            const inputAdmNoStr = document.getElementById('alt-adm').value.trim();
-            
-            // Rule constraint verification lookup routine logic path block validation checks
-            const isDuplicateAdmission = dbState.Beds.some(b => b.Status === 'Occupied' && b.AdmissionNo.toLowerCase() === inputAdmNoStr.toLowerCase());
-            if (isDuplicateAdmission) {
-                alert("Transaction Blocked: A student with this unique matching admission number has an existing active bed reservation.");
-                return;
-            }
+        async function processBedAssignmentExecution(event) {
+    event.preventDefault();
 
-            const indexTargetMatch = dbState.Beds.findIndex(b => b.BedID === activeTargetBedIdSelected);
-            if (indexTargetMatch > -1) {
-                dbState.Beds[indexTargetMatch] = {
-                    BedID: activeTargetBedIdSelected,
-                    Status: 'Occupied',
-                    AdmissionNo: inputAdmNoStr,
-                    StudentName: document.getElementById('alt-name').value.trim(),
-                    Course: document.getElementById('alt-course').value.trim(),
-                    Year: document.getElementById('alt-year').value.trim(),
-                    Phone: document.getElementById('alt-phone').value.trim(),
-                    ParentPhone: document.getElementById('alt-parent').value.trim(),
-                    Address: document.getElementById('alt-address').value.trim(),
-                    JoinDate: document.getElementById('alt-date').value,
-                    FeeStatus: document.getElementById('alt-fee').value
-                };
+    const inputAdmNoStr = document.getElementById('alt-adm').value.trim();
 
-                pushSystemStateToCloud();
-                renderDashboardLayout();
-                renderOccupantsTable();
-                closeBedSystemModal();
-            }
-        }
+    const isDuplicateAdmission = dbState.Beds.some(b =>
+        b.Status === 'Occupied' &&
+        b.AdmissionNo.toLowerCase() === inputAdmNoStr.toLowerCase()
+    );
 
+    if (isDuplicateAdmission) {
+        alert("This admission number already has an active bed.");
+        return;
+    }
+
+    const indexTargetMatch = dbState.Beds.findIndex(b => b.BedID === activeTargetBedIdSelected);
+
+    if (indexTargetMatch === -1) {
+        alert("Bed not found. Please refresh page.");
+        return;
+    }
+
+    dbState.Beds[indexTargetMatch] = {
+        BedID: activeTargetBedIdSelected,
+        Status: 'Occupied',
+        AdmissionNo: inputAdmNoStr,
+        StudentName: document.getElementById('alt-name').value.trim(),
+        Course: document.getElementById('alt-course').value.trim(),
+        Year: document.getElementById('alt-year').value.trim(),
+        Phone: document.getElementById('alt-phone').value.trim(),
+        ParentPhone: document.getElementById('alt-parent').value.trim(),
+        Address: document.getElementById('alt-address').value.trim(),
+        JoinDate: document.getElementById('alt-date').value,
+        FeeStatus: document.getElementById('alt-fee').value
+    };
+
+    await pushSystemStateToCloud();
+
+    renderDashboardLayout();
+    renderOccupantsTable();
+    closeBedSystemModal();
+
+    alert("Allotment saved successfully.");
+}
         function processBedCheckoutExecution() {
             if (!confirm("Are you sure you want to finalize checkout settlements operations for this occupant? This action is irreversible and releases the bed unit back to vacant space maps instantly.")) return;
 
